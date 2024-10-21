@@ -12,13 +12,39 @@ class Goal():
 
     @classmethod
     def create(cls, name, desc, target, end_date, user_id):
-        return cls(None, name, desc, target, end_date, None, user_id)
+        return cls(id=None, 
+                   name=name, 
+                   desc=desc, 
+                   target=target, 
+                   end_date=end_date, 
+                   created_at=None, 
+                   user_id=user_id)
     
-    def json(self):
-        return dict(id = self.id,
-                    name = self.name,
-                    desc = self.desc,
-                    target = self.target,
-                    end_date = self.end_date,
-                    created_at = self.created_at,
-                    user_id = self.user_id)
+    def __repr__(self):
+        return f'<Goal id={self.id}, name={self.name}, desc={self.desc}, target={self.target}, end_date={self.end_date}, created_at={self.created_at}, user_id={self.user_id}'
+
+    def display(self):
+        goal = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\
+              f'Goal ID:            {self.id}\n'\
+              f'Goal name:          {self.name}\n'\
+              f'Goal description:   {self.desc}\n'\
+              f'Goal target:        {self.target}\n'\
+              f'Goal end date:      {self.end_date}\n'\
+              f'Goal created:       {self.created_at}\n'\
+              '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+        print(goal)
+
+def get_goal():
+    pass
+
+
+def add_goal():
+    pass
+
+
+def update_goal():
+    pass
+
+
+def delete_goal():
+    pass

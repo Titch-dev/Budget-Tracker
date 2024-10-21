@@ -11,13 +11,35 @@ class Category():
 
     @classmethod
     def create(cls, name, desc, budget, user_id):
-        return cls(None, name, desc, budget, None, user_id)
+        return cls(id=None, 
+                   name=name, 
+                   desc=desc, 
+                   budget=budget,
+                   created_at=None, 
+                   user_id=user_id)
     
-    def json(self):
-        return dict(id = self.id, 
-                    name = self.name, 
-                    desc = self.desc, 
-                    budget = self.budget, 
-                    created_at = self.created_at, 
-                    user_id = self.user_id)
-    
+    def __repr__(self):
+        return f'<Category id={self.id}, name={self.name}, desc={self.desc}, budget={self.budget}, created_at={self.created_at}, user_id={self.user_id}'
+
+    def display(self):
+        category = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\
+              f'Category ID:                {self.id}\n'\
+              f'Category name:              {self.name}\n'\
+              f'Category description:       {self.desc}\n'\
+              f'Category monthly budget:    {self.budget}\n'\
+              f'Category created at:        {self.created_at}\n'\
+              '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+        print(category)
+
+
+def get_category():
+    pass
+
+def add_category():
+    pass
+
+def update_category():
+    pass
+
+def delete_category():
+    pass

@@ -1,2 +1,5 @@
 # database
 budget_tracker.db
+
+# pycache
+__pycache__/
