@@ -12,15 +12,15 @@ class Expense():
         self.goal_name = goal_name
 
     @classmethod
-    def create(cls, name, amount, effect_date, user_id, category_name, goal_name):
+    def create(cls, name, amount, effect_date, user_id):
         return cls(id=None, 
                    name=name, 
                    amount=amount, 
                    effect_date=effect_date, 
                    created_at=None, 
                    user_id=user_id, 
-                   category_name=category_name, 
-                   goal_name=goal_name)
+                   category_name=None,
+                   goal_name=None)
     
     def __repr__(self):
         return f'<Expense id={self.id}, name={self.name}, amount={self.amount}, effect_date={self.effect_date}, created_at={self.created_at}, user_id={self.user_id}, category_name={self.category_name}, goal_name={self.goal_name}>'

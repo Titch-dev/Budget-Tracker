@@ -3,3 +3,6 @@ budget_tracker.db
 
 # pycache
 __pycache__/
+
+# apple
+.idea/

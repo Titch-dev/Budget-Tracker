@@ -11,14 +11,14 @@ def display_formatter(template: str, *dynamic_vars: str | int):
     return template.format(*dynamic_vars)
 
 
-def enumerate_object(objects: list[dict]) -> dict:
-    """Function to enumerate a list of json dictionary
+def enumerate_object(objects: list[object]) -> dict:
+    """Function to enumerate a list of objects
 
     Parameters:
-        objects: List of object json dictionary
+        objects: List of objects
 
     Returns:
-        Dictionary of enumerated keys and json values
+        Dictionary of enumerated (keys) objects (values)
     """
     enumerated_objects = dict()
     for idx, obj in enumerate(objects, 1):

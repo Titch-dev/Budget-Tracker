@@ -2,7 +2,7 @@ from datetime import datetime
 
 class User():
     def __init__(self, id: int, email: str, password: str, created_at: datetime, last_login: datetime) -> None:
-        self.id = id,
+        self.id = id
         self.email = email
         self.password = password
         self.created_at = created_at
