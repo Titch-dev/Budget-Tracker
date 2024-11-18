@@ -1,4 +1,4 @@
-def display_formatter(template: str, *dynamic_vars: str | int):
+def display_formatter(template: str, *dynamic_vars: str | int | float):
     """Function to dynamically enter variables to display strings
 
     Parameters:

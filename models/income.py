@@ -23,15 +23,18 @@ class Income():
     def __repr__(self):
         return f'<Income id={self.id}, name={self.name}, amount={self.amount}, effect_date={self.effect_date}, created_at={self.created_at}, user_id={self.user_id}, category_name={self.category_name}>'
     
-    def display(self):
-        income = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\
-              f'Income ID:          {self.id}\n'\
-              f'Income name:        {self.name}\n'\
-              f'Income amount:      {self.amount}\n'\
-              f'Income effect date: {self.effect_date}\n'\
-              f'Income category:    {self.category_name}\n'\
-              f'Income created:     {self.created_at}\n'\
-              '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+    def display(self, reference=None):
+        income = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+        if reference:
+            income += f'                                                       reference #{reference} \n'
+        income += f'Income ID:          {self.id}\n'\
+                  f'Income name:        {self.name}\n'\
+                  f'Income amount:      {self.amount}\n'\
+                  f'Income effect date: {self.effect_date}\n'\
+                  f'Income category:    {self.category_name}\n'\
+                  f'Income created:     {self.created_at}\n'\
+                  '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+
         print(income)
 
 def get_income():

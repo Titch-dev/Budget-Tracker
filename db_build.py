@@ -70,7 +70,7 @@ INSERT INTO goal(name, desc, target, end_date, user_id)
     VALUES (?, ?, ?, ?, ?)
 '''
 
-INITIAL_GOAL = ("Vacation Fund", "Saving for a vacation trip to Hawaii.", 5000.00, "2025-06-01 00:00:00", 1)
+INITIAL_GOAL = ("Vacation Fund", "Saving for a vacation trip to Hawaii.", 5000.00, "2025-06-01", 1)
 
 
 CREATE_EXPENSE_TABLE = '''
@@ -102,25 +102,25 @@ INSERT INTO expense (name, amount, effect_date, user_id, category_id, goal_id)
     VALUES (?, ?, ?, ?, ?, ?)'''
 
 INITIAL_EXPENSES = [
-    ("Rent", 1200.00, "2024-07-01 00:00:00", 1, 2, None),
-    ("Electricity Bill", 60.00, "2024-07-03 00:00:00", 1, 3, None),
-    ("Ask Italian", 40.00, "2024-07-05 00:00:00", 1, 4, None),
-    ("Gas Bill", 30.00, "2024-07-06 00:00:00", 1, 3, None),
-    ("Burger King", 15.00, "2024-07-20 00:00:00", 1, 4, None),
-    ("Rent", 1200.00, "2024-08-01 00:00:00", 1, 2, None),
-    ("Electricity Bill", 60.00, "2024-08-03 00:00:00", 1, 3, None),
-    ("Gas Bill", 30.00, "2024-08-06 00:00:00", 1, 3, None),
-    ("Vacation Saving", 20.00, "2024-08-25 00:00:00", 1, 6, 1),
-    ("Rent", 1200.00, "2024-09-01 00:00:00", 1, 2, None),
-    ("Electricity Bill", 60.00, "2024-09-03 00:00:00", 1, 3, None),
-    ("Gas Bill", 30.00, "2024-09-06 00:00:00", 1, 3, None),
-    ("Vacation Saving", 30.00, "2024-09-25 00:00:00", 1, 6, 1),
-    ("Rent", 1200.00, "2024-10-01 00:00:00", 1, 2, None),
-    ("Gym", 75.00, "2024-10-02 00:00:00", 1, 5, None),
-    ("Electricity Bill", 60.00, "2024-10-03 00:00:00", 1, 3, None),
-    ("Gas Bill", 30.00, "2024-10-06 00:00:00", 1, 3, None),
-    ("Yo Sushi", 45.00, "2024-10-10 00:00:00", 1, 4, None),
-    ("Vacation Saving", 30.00, "2024-10-25 00:00:00", 1, 6, 1)
+    ("Rent", 1200.00, "2024-07-01", 1, 2, None),
+    ("Electricity Bill", 60.00, "2024-07-03", 1, 3, None),
+    ("Ask Italian", 40.00, "2024-07-05", 1, 4, None),
+    ("Gas Bill", 30.00, "2024-07-06", 1, 3, None),
+    ("Burger King", 15.00, "2024-07-20", 1, 4, None),
+    ("Rent", 1200.00, "2024-08-01", 1, 2, None),
+    ("Electricity Bill", 60.00, "2024-08-03", 1, 3, None),
+    ("Gas Bill", 30.00, "2024-08-06", 1, 3, None),
+    ("Vacation Saving", 20.00, "2024-08-25", 1, 6, 1),
+    ("Rent", 1200.00, "2024-09-01", 1, 2, None),
+    ("Electricity Bill", 60.00, "2024-09-03", 1, 3, None),
+    ("Gas Bill", 30.00, "2024-09-06", 1, 3, None),
+    ("Vacation Saving", 30.00, "2024-09-25", 1, 6, 1),
+    ("Rent", 1200.00, "2024-10-01", 1, 2, None),
+    ("Gym", 75.00, "2024-10-02", 1, 5, None),
+    ("Electricity Bill", 60.00, "2024-10-03", 1, 3, None),
+    ("Gas Bill", 30.00, "2024-10-06", 1, 3, None),
+    ("Yo Sushi", 45.00, "2024-10-10", 1, 4, None),
+    ("Vacation Saving", 30.00, "2024-10-25", 1, 6, 1)
 ]
 
 CREATE_INCOME_TABLE = '''
@@ -148,11 +148,11 @@ INSERT INTO income (name, amount, effect_date, user_id, category_id)
 '''
 
 INITIAL_INCOME = [
-    ("Work Salary", 2000.00, "2024-06-25 00:00:00", 1, 1),
-    ("Work Salary", 2000.00, "2024-07-25 00:00:00", 1, 1),
-    ("Work Salary", 2000.00, "2024-08-25 00:00:00", 1, 1),
-    ("Work Salary", 2000.00, "2024-09-25 00:00:00", 1, 1),
-    ("Work Salary", 2000.00, "2024-10-25 00:00:00", 1, 1),
+    ("Work Salary", 2000.00, "2024-06-25", 1, 1),
+    ("Work Salary", 2000.00, "2024-07-25", 1, 1),
+    ("Work Salary", 2000.00, "2024-08-25", 1, 1),
+    ("Work Salary", 2000.00, "2024-09-25", 1, 1),
+    ("Work Salary", 2000.00, "2024-10-25", 1, 1),
 ]
 
 try:

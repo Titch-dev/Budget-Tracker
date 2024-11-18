@@ -12,7 +12,8 @@ from db_access import get_income_by_id, get_user_by_id, get_goal_by_id, \
     get_user_categories, get_user_expenses, get_user_goals, get_user_income, \
     delete_category, delete_expense, delete_goal, delete_income, delete_user, \
     update_category, update_expense, update_goal, update_income, update_user, \
-    create_user, create_goal, create_category, create_expense, create_income
+    create_user, create_goal, create_category, create_expense, create_income, \
+    get_expenses_by_category, get_income_by_category, get_expenses_by_month
 
 from db_build import CREATE_USER_TABLE, CREATE_CATEGORY_TABLE, CREATE_GOAL_TABLE, \
     CREATE_INCOME_TABLE, CREATE_EXPENSE_TABLE, INSERT_USER, INSERT_CATEGORIES, \
@@ -278,35 +279,35 @@ class TestDBAccess(TestCase):
                                   name='Work Salary',
                                   amount=2000.0,
                                   user_id=1,
-                                  effect_date=None,
+                                  effect_date='2024-06-25 00:00:00',
                                   created_at=None,
                                   category_name='Salary'),
                            Income(id=2,
                                   name='Work Salary',
                                   amount=2000.0,
                                   user_id=1,
-                                  effect_date=None,
+                                  effect_date='2024-07-25 00:00:00',
                                   created_at=None,
                                   category_name='Salary'),
                            Income(id=3,
                                   name='Work Salary',
                                   amount=2000.0,
                                   user_id=1,
-                                  effect_date=None,
+                                  effect_date='2024-08-25 00:00:00',
                                   created_at=None,
                                   category_name='Salary'),
                            Income(id=4,
                                   name='Work Salary',
                                   amount=2000.0,
                                   user_id=1,
-                                  effect_date=None,
+                                  effect_date='2024-09-25 00:00:00',
                                   created_at=None,
                                   category_name='Salary'),
                            Income(id=5,
                                   name='Work Salary',
                                   amount=2000.0,
                                   user_id=1,
-                                  effect_date=None,
+                                  effect_date='2024-10-25 00:00:00',
                                   created_at=None,
                                   category_name='Salary')]
         actual_income = get_user_income(1)
@@ -317,6 +318,58 @@ class TestDBAccess(TestCase):
             self.assertEqual(actual.id, expected.id)
             self.assertEqual(actual.name, expected.name)
             self.assertEqual(actual.amount, expected.amount)
+            self.assertEqual(actual.effect_date, expected.effect_date)
+            self.assertEqual(actual.user_id, expected.user_id)
+            self.assertEqual(actual.category_name, expected.category_name)
+
+    def test_get_income_by_category(self):
+        expected_income = [
+            Income(id=1,
+                   name='Work Salary',
+                   amount=2000.0,
+                   effect_date='2024-06-25 00:00:00',
+                   created_at=None,
+                   user_id=1,
+                   category_name='Salary'),
+            Income(id=2,
+                   name='Work Salary',
+                   amount=2000.0,
+                   effect_date='2024-07-25 00:00:00',
+                   created_at=None,
+                   user_id=1,
+                   category_name='Salary'),
+            Income(id=3,
+                   name='Work Salary',
+                   amount=2000.0,
+                   effect_date='2024-08-25 00:00:00',
+                   created_at=None,
+                   user_id=1,
+                   category_name='Salary'),
+            Income(id=4,
+                   name='Work Salary',
+                   amount=2000.0,
+                   effect_date='2024-09-25 00:00:00',
+                   created_at=None,
+                   user_id=1,
+                   category_name='Salary'),
+            Income(id=5,
+                   name='Work Salary',
+                   amount=2000.0,
+                   effect_date='2024-10-25 00:00:00',
+                   created_at=None,
+                   user_id=1,
+                   category_name='Salary'),
+        ]
+
+        actual_income = get_income_by_category(1)
+
+        self.assertEqual(len(actual_income), len(expected_income))
+
+        for actual, expected in zip(actual_income, expected_income):
+            self.assertEqual(actual.id, expected.id)
+            self.assertEqual(actual.name, expected.name)
+            self.assertEqual(actual.amount, expected.amount)
+            self.assertEqual(actual.effect_date, expected.effect_date)
             self.assertEqual(actual.user_id, expected.user_id)
             self.assertEqual(actual.category_name, expected.category_name)
 
@@ -536,6 +589,30 @@ class TestDBAccess(TestCase):
             self.assertEqual(expected.category_name, actual.category_name)
             self.assertEqual(expected.goal_name, actual.goal_name)
 
+    def test_get_expenses_by_category(self):
+        expected_expenses = [
+            Expense(id=15,
+                    name='Gym',
+                    amount=75.0,
+                    effect_date='2024-10-02 00:00:00',
+                    created_at='2024-10-31 21:20:57',
+                    user_id=1,
+                    category_name='Health & Fitness',
+                    goal_name=None)
+        ]
+        actual_expenses = get_expenses_by_category(5)
+
+        self.assertEqual(len(expected_expenses), len(actual_expenses), 'The lists lengths dont match')
+
+        for expected, actual in zip(expected_expenses, actual_expenses):
+            self.assertEqual(expected.id, actual.id)
+            self.assertEqual(expected.name, actual.name)
+            self.assertEqual(expected.amount, actual.amount)
+            self.assertEqual(expected.effect_date, actual.effect_date)
+            self.assertEqual(expected.user_id, actual.user_id)
+            self.assertEqual(expected.category_name, actual.category_name)
+            self.assertEqual(expected.goal_name, actual.goal_name)
+
     def test_update_expense(self):
         expected = get_expense_by_id(1)
         expected.name = 'test'
@@ -554,3 +631,34 @@ class TestDBAccess(TestCase):
         actual = get_expense_by_id(expense_id)
 
         self.assertFalse(actual)
+
+    def test_get_expense_by_month(self):
+        expected = [Expense(id=16,
+                            name='Electricity Bill',
+                            amount=60.0,
+                            effect_date='2024-10-03',
+                            created_at=None,
+                            user_id=1,
+                            category_name='Utilities',
+                            goal_name=None),
+                    Expense(id=17,
+                            name='Gas Bill',
+                            amount=30.0,
+                            effect_date='2024-10-06',
+                            created_at=None,
+                            user_id=1,
+                            category_name='Utilities',
+                            goal_name=None)
+                    ]
+        actual = get_expenses_by_month('2024-10', 3)
+
+        self.assertEqual(len(expected), len(actual), 'The lists lengths dont match')
+
+        for expected, actual in zip(expected, actual):
+            self.assertEqual(expected.id, actual.id)
+            self.assertEqual(expected.name, actual.name)
+            self.assertEqual(expected.amount, actual.amount)
+            self.assertEqual(expected.effect_date, actual.effect_date)
+            self.assertEqual(expected.user_id, actual.user_id)
+            self.assertEqual(expected.category_name, actual.category_name)
+            self.assertEqual(expected.goal_name, actual.goal_name)

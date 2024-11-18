@@ -19,16 +19,17 @@ class Category():
                    user_id=user_id)
     
     def __repr__(self):
-        return f'<Category id={self.id}, name={self.name}, desc={self.desc}, budget={self.budget}, created_at={self.created_at}, user_id={self.user_id}'
+        return f'<Category id={self.id}, name={self.name}, desc={self.desc}, budget={self.budget}, created_at={self.created_at}, user_id={self.user_id}>'
 
-    def display(self):
-        category = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\
-              f'Category ID:                {self.id}\n'\
-              f'Category name:              {self.name}\n'\
-              f'Category description:       {self.desc}\n'\
-              f'Category monthly budget:    {self.budget}\n'\
-              f'Category created at:        {self.created_at}\n'\
-              '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+    def display(self, reference=None):
+        category = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+        if reference:
+            category += f'                                                       reference #{reference} \n'
+        category += f'Category ID:                {self.id}\n'\
+                    f'Category name:              {self.name}\n'\
+                    f'Category description:       {self.desc}\n'\
+                    f'Category monthly budget:    {self.budget}\n'\
+                    '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         print(category)
 
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-class User():
+class User:
     def __init__(self, id: int, email: str, password: str, created_at: datetime, last_login: datetime) -> None:
         self.id = id
         self.email = email
@@ -28,7 +28,3 @@ class User():
               f'User last login: {self.last_login}\n'\
               '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         print(user)
-    
-    # TODO:
-    #   - create a print method for object
-    #   - 

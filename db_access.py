@@ -72,16 +72,18 @@ def get_user_by_email(email: str) -> User:
     cur.execute(command, (email,))
     data = cur.fetchone()
     conn.close()
-    user = User(id=data[0],
-                email=data[1],
-                password=data[2],
-                created_at=data[3],
-                last_login=data[4])
-    return user
+    try:
+        return User(id=data[0],
+                    email=data[1],
+                    password=data[2],
+                    created_at=data[3],
+                    last_login=data[4])
+    except TypeError:
+        return data
 
 ### CATEGORY
 # create category
-def create_category(category: Category) -> None:
+def create_category(category: Category) -> int:
     conn, cur = db_connect()
     command = '''INSERT INTO category(name, desc, budget, user_id)
                     VALUES(?, ?, ?, ?)'''
@@ -90,8 +92,11 @@ def create_category(category: Category) -> None:
                           category.budget,
                           category.user_id))
     conn.commit()
-    conn.close()
     print(f'category: {category.name}, has been created')
+    category_id = cur.lastrowid
+    conn.close()
+
+    return category_id
 
 # update category
 def update_category(category: Category) -> None:
@@ -169,9 +174,11 @@ def create_goal(goal: Goal) -> None:
                           goal.end_date,
                           goal.user_id))
     conn.commit()
-    conn.close()
     print(f'goal: {goal.name}, has been created')
+    goal_id = cur.lastrowid
+    conn.close()
 
+    return goal_id
 # update goal
 def update_goal(goal: Goal) -> None:
     conn, cur = db_connect()
@@ -340,7 +347,7 @@ def get_income_by_id(income_id: int) -> Income:
                  ON
                     i.category_id = c.id
                  WHERE 
-                    i.id = (?)'''
+                    i.id = ?'''
     cur.execute(command,(income_id,))
     data = cur.fetchone()
     conn.close()
@@ -352,6 +359,44 @@ def get_income_by_id(income_id: int) -> Income:
                       created_at=data[4],
                       user_id=data[5],
                       category_name=data[6])
+    except TypeError:
+        return data
+
+# get incomes by category
+def get_income_by_category(category_id: int) -> list[Income]:
+    conn, cur = db_connect()
+    command = '''SELECT
+                    i.id,
+                    i.name,
+                    i.amount,
+                    i.effect_date,
+                    i.created_at,
+                    i.user_id,
+                    c.name as category_name
+                 FROM
+                    income i
+                 INNER JOIN
+                    category c
+                 ON
+                    i.category_id = c.id
+                 WHERE
+                    c.id = ?'''
+    cur.execute(command, (category_id, ))
+    data = cur.fetchall()
+    conn.close()
+    incomes = []
+    try:
+        for row in data:
+            income = Income(id=row[0],
+                            name=row[1],
+                            amount=row[2],
+                            effect_date=row[3],
+                            created_at=row[4],
+                            user_id=row[5],
+                            category_name=row[6])
+            incomes.append(income)
+
+        return incomes
     except TypeError:
         return data
 
@@ -482,5 +527,94 @@ def get_expense_by_id(expense_id: int) -> Expense:
                        user_id=data[5],
                        category_name=data[6],
                        goal_name=data[7])
+    except TypeError:
+        return data
+
+# get expenses by category
+def get_expenses_by_category(category_id: int):
+    conn, cur = db_connect()
+    command = '''SELECT
+                    e.id,
+                    e.name,
+                    e.amount,
+                    e.effect_date,
+                    e.created_at,
+                    e.user_id,
+                    c.name as category_name,
+                    g.name as goal_name
+                 FROM
+                    expense e
+                 LEFT JOIN
+                    category c
+                 ON
+                    e.category_id = c.id
+                 LEFT JOIN
+                    goal g
+                 ON
+                    e.goal_id = g.id
+                 WHERE
+                    e.category_id = ?'''
+    cur.execute(command, (category_id, ))
+    data = cur.fetchall()
+    conn.close()
+    expenses = []
+    try:
+        for row in data:
+            expense = Expense(id=row[0],
+                              name=row[1],
+                              amount=row[2],
+                              effect_date=row[3],
+                              created_at=row[4],
+                              user_id=row[5],
+                              category_name=row[6],
+                              goal_name=row[7])
+            expenses.append(expense)
+        return expenses
+    except TypeError:
+        return data
+
+
+# get expenses by current month
+def get_expenses_by_month(current_month: str, category_id: int):
+    conn, cur = db_connect()
+    command = '''SELECT
+                    e.id,
+                    e.name,
+                    e.amount,
+                    e.effect_date,
+                    e.created_at,
+                    e.user_id,
+                    c.name as category_name,
+                    g.name as goal_name
+                 FROM
+                    expense e
+                 LEFT JOIN
+                    category c
+                 ON
+                    e.category_id = c.id
+                 LEFT JOIN
+                    goal g
+                 ON
+                    e.goal_id = g.id
+                 WHERE
+                    e.effect_date LIKE ?
+                 AND
+                    e.category_id = ?'''
+    cur.execute(command, (current_month + '%', category_id, ))
+    data = cur.fetchall()
+    conn.close()
+    expenses = []
+    try:
+        for row in data:
+            expense = Expense(id=row[0],
+                              name=row[1],
+                              amount=row[2],
+                              effect_date=row[3],
+                              created_at=row[4],
+                              user_id=row[5],
+                              category_name=row[6],
+                              goal_name=row[7])
+            expenses.append(expense)
+        return expenses
     except TypeError:
         return data
