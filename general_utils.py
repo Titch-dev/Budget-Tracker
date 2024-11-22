@@ -11,16 +11,12 @@ def display_formatter(template: str, *dynamic_vars: str | int | float):
     return template.format(*dynamic_vars)
 
 
-def enumerate_object(objects: list[object]) -> dict:
-    """Function to enumerate a list of objects
+def date_formatter(full_date: bool):
 
-    Parameters:
-        objects: List of objects
-
-    Returns:
-        Dictionary of enumerated (keys) objects (values)
-    """
-    enumerated_objects = dict()
-    for idx, obj in enumerate(objects, 1):
-        enumerated_objects[idx] = obj
-    return enumerated_objects
+    year = input('Enter year (YYYY): ')
+    month = input('Enter month (MM): ')
+    if full_date:
+        day = input(f'Enter day (DD): ')
+        return f'{year}-{month}-{day}'
+    else:
+        return f'{year}-{month}'

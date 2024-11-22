@@ -1,34 +1,47 @@
 from datetime import datetime
 
-class Category():
-    def __init__(self, id: int, name: str, desc: str, budget: float, created_at: datetime, user_id: int) -> None:
+
+class Category:
+    def __init__(self, id: int, name: str, desc: str, budget: float,
+                 cat_type: str, created_at: datetime, user_id: int) -> None:
         self.id = id
         self.name = name
         self.desc = desc
         self.budget = budget
+        self.cat_type = cat_type
         self.created_at = created_at
         self.user_id = user_id
 
     @classmethod
-    def create(cls, name, desc, budget, user_id):
+    def create(cls, name, desc, budget, cat_type, user_id):
         return cls(id=None, 
                    name=name, 
                    desc=desc, 
                    budget=budget,
+                   cat_type=cat_type,
                    created_at=None, 
                    user_id=user_id)
     
     def __repr__(self):
         return f'<Category id={self.id}, name={self.name}, desc={self.desc}, budget={self.budget}, created_at={self.created_at}, user_id={self.user_id}>'
 
-    def display(self, reference=None):
+    def display_short(self, reference=None):
         category = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         if reference:
-            category += f'                                                       reference #{reference} \n'
-        category += f'Category ID:                {self.id}\n'\
+            category += f'                                                       reference #{reference}\n'
+        category += f'Category name:              {self.name}\n'\
+                    f'Category description:       {self.desc}\n'\
+                    f'Category monthly budget:    {self.budget}\n'\
+                    '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+        print(category)
+
+    def display_long(self):
+        category = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\
+                    f'Category ID:                {self.id}\n'\
                     f'Category name:              {self.name}\n'\
                     f'Category description:       {self.desc}\n'\
                     f'Category monthly budget:    {self.budget}\n'\
+                    f'Category type:              {self.cat_type}\n'\
                     '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         print(category)
 

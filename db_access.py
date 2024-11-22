@@ -6,14 +6,20 @@ from models.goal import Goal
 from models.category import Category
 from models.user import User
 
+
 def db_connect():
     conn = sqlite3.connect('budget_tracker.db')
     cur = conn.cursor()
     return conn, cur
 
-### USER
-# create user
+
+##### USER #####
 def create_user(user: User) -> None:
+    """Function to create a user entry
+
+    Parameters:
+        user: User object
+    """
     conn, cur = db_connect()
     command = '''INSERT INTO user (email, password) 
                     VALUES (?, ?)'''
@@ -23,8 +29,13 @@ def create_user(user: User) -> None:
     conn.close()
     print(f'user: {user.email}, has been created')
 
-# update user
+
 def update_user(user: User) -> None:
+    """Function to update a user entry
+
+    Parameters:
+        user: User object
+    """
     conn, cur = db_connect()
     command = '''UPDATE user
                 SET email = ?,
@@ -39,8 +50,13 @@ def update_user(user: User) -> None:
     conn.close()
     print(f'user: {user.email}, has been updated')
 
-# delete user
+
 def delete_user(user_id: int) -> None:
+    """Function to delete a user entry
+
+    Parameters:
+        user_id: Int
+    """
     conn, cur = db_connect()
     command = '''DELETE FROM user WHERE id = ?'''
     cur.execute(command, (user_id,))
@@ -48,8 +64,16 @@ def delete_user(user_id: int) -> None:
     conn.close()
     print(f'user: {user_id}, has been deleted')
 
-# get user
+
 def get_user_by_id(user_id: int) -> User:
+    """Function to update a user entry
+
+    Parameters:
+        user_id: Int
+
+    Returns:
+        User object
+    """
     conn, cur = db_connect()
     command = '''SELECT * FROM user WHERE id = ?'''
     cur.execute(command, (user_id,))
@@ -67,6 +91,14 @@ def get_user_by_id(user_id: int) -> User:
 
 
 def get_user_by_email(email: str) -> User:
+    """Function to get a user entry by email
+
+    Parameters:
+        email: Str
+
+    Returns:
+        User object
+    """
     conn, cur = db_connect()
     command = '''SELECT * FROM user WHERE email = ?'''
     cur.execute(command, (email,))
@@ -81,15 +113,24 @@ def get_user_by_email(email: str) -> User:
     except TypeError:
         return data
 
-### CATEGORY
-# create category
+
+##### CATEGORY #####
 def create_category(category: Category) -> int:
+    """Function to create a category entry
+
+    Parameters:
+        category: Category
+
+    Returns:
+        category_id: Int
+    """
     conn, cur = db_connect()
-    command = '''INSERT INTO category(name, desc, budget, user_id)
-                    VALUES(?, ?, ?, ?)'''
+    command = '''INSERT INTO category(name, desc, budget, cat_type, user_id)
+                    VALUES(?, ?, ?, ?, ?)'''
     cur.execute(command, (category.name,
                           category.desc,
                           category.budget,
+                          category.cat_type,
                           category.user_id))
     conn.commit()
     print(f'category: {category.name}, has been created')
@@ -98,8 +139,13 @@ def create_category(category: Category) -> int:
 
     return category_id
 
-# update category
+
 def update_category(category: Category) -> None:
+    """Function to update a category entry
+
+    Parameters:
+        category: Category object
+    """
     conn, cur = db_connect()
     command = '''UPDATE
                     category
@@ -117,8 +163,13 @@ def update_category(category: Category) -> None:
     conn.close()
     print(f'category: {category.name}, has been updated')
 
-# delete Category
+
 def delete_category(category_id: int) -> None:
+    """Function to delete a category entry
+
+    Parameters:
+        category_id: Int
+    """
     conn, cur = db_connect()
     command = '''DELETE FROM category WHERE id = ?'''
     cur.execute(command, (category_id,))
@@ -126,27 +177,47 @@ def delete_category(category_id: int) -> None:
     conn.close()
     print(f'category: {category_id}, has been deleted')
 
-# get all user's categories
-def get_user_categories(user_id: int) -> list[Category]:
+
+def get_user_categories(user_id: int) -> list[Category] | None:
+    """Function to get a list of categories
+
+    Parameters:
+        user_id: Int
+
+    Returns:
+        list of Category objects
+    """
     conn, cur = db_connect()
     command = '''SELECT * FROM category WHERE user_id = ?'''
     cur.execute(command, (user_id,))
     data = cur.fetchall()
     conn.close()
     categories = []
-    for entry in data:
-        category = Category(id=entry[0],
-                            name=entry[1],
-                            desc=entry[2],
-                            budget=entry[3],
-                            created_at=entry[4],
-                            user_id=entry[5])
-        categories.append(category)
+    try:
+        for row in data:
+            category = Category(id=row[0],
+                                name=row[1],
+                                desc=row[2],
+                                budget=row[3],
+                                cat_type=row[4],
+                                created_at=row[5],
+                                user_id=row[6])
+            categories.append(category)
 
-    return categories
+        return categories
+    except TypeError:
+        return data
 
-# get category by ID
-def get_category_by_id(cat_id:int) -> Category:
+
+def get_category_by_id(cat_id: int) -> Category:
+    """Function to get a Category by id
+
+    Parameters:
+        cat_id: Int
+
+    Returns:
+        A Category object
+    """
     conn, cur = db_connect()
     command = '''SELECT * FROM category WHERE id = ?'''
     cur.execute(command, (cat_id, ))
@@ -157,14 +228,80 @@ def get_category_by_id(cat_id:int) -> Category:
                         name=data[1],
                         desc=data[2],
                         budget=data[3],
-                        created_at=data[4],
-                        user_id=data[5])
+                        cat_type=data[4],
+                        created_at=data[5],
+                        user_id=data[6])
     except TypeError:
         return data
 
-### GOAL
-# create goal
-def create_goal(goal: Goal) -> None:
+
+def get_category_by_name(name: str) -> Category | None:
+    """Function to get a category by name
+
+    Parameters:
+        name: Str
+
+    Returns:
+        A Category object
+    """
+    conn, cur = db_connect()
+    command = '''SELECT * FROM category WHERE name = ?'''
+    cur.execute(command, (name, ))
+    data = cur.fetchone()
+    try:
+        return Category(id=data[0],
+                        name=data[1],
+                        desc=data[2],
+                        budget=data[3],
+                        cat_type=data[4],
+                        created_at=data[5],
+                        user_id=data[6])
+    except TypeError:
+        return data
+
+
+def get_user_categories_by_type(user_id: int, cat_type: str) -> list[Category] | None:
+    """Function to get a list of categories by category type
+
+    Parameters:
+        user_id: Int
+        cat_type: Int
+
+    Returns:
+        list of Category objects
+    """
+    conn, cur = db_connect()
+    command = '''SELECT * FROM category WHERE user_id = ? AND cat_type = ?'''
+    cur.execute(command, (user_id, cat_type, ))
+    data = cur.fetchall()
+    conn.close()
+    categories = list()
+    try:
+        for row in data:
+            category = Category(id=row[0],
+                                name=row[1],
+                                desc=row[2],
+                                budget=row[3],
+                                cat_type=row[4],
+                                created_at=row[5],
+                                user_id=row[6])
+            categories.append(category)
+
+        return categories
+    except TypeError:
+        return data
+
+
+##### GOAL #####
+def create_goal(goal: Goal) -> int:
+    """Function to create a Goal and return the id
+
+    Parameters:
+        goal: Goal
+
+    Returns:
+        An Integer - Goal id
+    """
     conn, cur = db_connect()
     command = '''INSERT INTO goal (name, desc, target, end_date, user_id)
                     VALUES(?, ?, ?, ?, ?)'''
@@ -179,8 +316,14 @@ def create_goal(goal: Goal) -> None:
     conn.close()
 
     return goal_id
-# update goal
+
+
 def update_goal(goal: Goal) -> None:
+    """Function to update a Goal entry
+
+    Parameters:
+        goal: Goal
+    """
     conn, cur = db_connect()
     command = '''UPDATE 
                     goal
@@ -200,8 +343,13 @@ def update_goal(goal: Goal) -> None:
     conn.close()
     print(f'goal: {goal.name}, has been updated')
 
-# delete goal
+
 def delete_goal(goal_id: int) -> None:
+    """Function to delete a Goal entry
+
+    Parameters:
+        goal_id: Int
+    """
     conn, cur = db_connect()
     command = '''DELETE FROM goal WHERE id = ?'''
     cur.execute(command, (goal_id, ))
@@ -209,28 +357,47 @@ def delete_goal(goal_id: int) -> None:
     conn.close()
     print(f'goal: {goal_id}, has been deleted')
 
-# get all user's goals
-def get_user_goals(user_id: int) -> list[Goal]:
+
+def get_user_goals(user_id: int) -> list[Goal] | None:
+    """Function to get list of user Goal objects
+
+    Parameters:
+        user_id: Int
+
+    Returns:
+        A list of Goal objects
+    """
     conn, cur = db_connect()
     command = '''SELECT * FROM goal WHERE user_id = ?'''
     cur.execute(command, (user_id, ))
     data = cur.fetchall()
     conn.close()
     goals = []
-    for row in data:
-        goal = Goal(id=row[0],
-                    name=row[1],
-                    desc=row[2],
-                    target=row[3],
-                    end_date=row[4],
-                    created_at=row[5],
-                    user_id=row[6])
-        goals.append(goal)
+    try:
+        for row in data:
+            goal = Goal(id=row[0],
+                        name=row[1],
+                        desc=row[2],
+                        target=row[3],
+                        end_date=row[4],
+                        created_at=row[5],
+                        user_id=row[6])
+            goals.append(goal)
 
-    return goals
+        return goals
+    except TypeError:
+        return data
 
-# get goal by id
-def get_goal_by_id(goal_id: int) -> Goal:
+
+def get_goal_by_id(goal_id: int) -> Goal | None:
+    """Function to get a Goal by the id
+
+    Parameters:
+        goal_id: Int
+
+    Returns:
+        A Goal object
+    """
     conn, cur = db_connect()
     command = '''SELECT * FROM goal WHERE id = ?'''
     cur.execute(command, (goal_id,))
@@ -247,9 +414,17 @@ def get_goal_by_id(goal_id: int) -> Goal:
     except TypeError:
         return data
 
-### INCOME
-# insert income
-def create_income(income: Income, cat_id: int) -> None:
+
+##### INCOME #####
+def create_income(income: Income) -> int:
+    """Function to create an Income entry and return the id
+
+    Parameters:
+        income: Income
+
+    Returns:
+        An Integer - Income id
+    """
     conn, cur = db_connect()
     command = '''INSERT INTO income(name, amount, effect_date, user_id, category_id)
                     VALUES (?, ?, ?, ?, ?)'''
@@ -257,13 +432,21 @@ def create_income(income: Income, cat_id: int) -> None:
                           income.amount,
                           income.effect_date,
                           income.user_id,
-                          cat_id))
+                          income.cat_id))
     conn.commit()
-    conn.close()
     print(f'income: {income.name}, has been created')
+    income_id = cur.lastrowid
+    conn.close()
 
-# update income
-def update_income(income: Income, cat_id: int) -> None:
+    return income_id
+
+
+def update_income(income: Income) -> None:
+    """Function to update an Income entry
+
+    Parameters:
+        income: Income
+    """
     conn, cur = db_connect()
     command = f'''UPDATE 
                     income
@@ -277,14 +460,19 @@ def update_income(income: Income, cat_id: int) -> None:
     cur.execute(command, (income.name,
                           income.amount,
                           income.effect_date,
-                          cat_id,
+                          income.cat_id,
                           income.id))
     conn.commit()
     conn.close()
     print(f'income: {income.id}, has been updated')
 
-# delete income
+
 def delete_income(income_id: int) -> None:
+    """Function to delete an Income entry
+
+    Parameters:
+        income_id: Int
+    """
     conn, cur = db_connect()
     command = '''DELETE FROM income WHERE id = ?'''
     cur.execute(command, (income_id, ))
@@ -292,8 +480,16 @@ def delete_income(income_id: int) -> None:
     conn.close()
     print(f'income: {income_id}, has been dleeted')
 
-# get all user's income
-def get_user_income(user_id: int) -> list[Income]:
+
+def get_user_income(user_id: int) -> list[Income] | None:
+    """Function to get a list of Income objects
+
+    Parameters:
+        user_id: Int
+
+    Returns:
+        An list of Income objects
+    """
     conn, cur = db_connect()
     command = '''SELECT
                     i.id,
@@ -302,6 +498,7 @@ def get_user_income(user_id: int) -> list[Income]:
                     i.effect_date,
                     i.created_at,
                     i.user_id,
+                    i.category_id,
                     c.name as category_name 
                  FROM
                     income i
@@ -323,14 +520,24 @@ def get_user_income(user_id: int) -> list[Income]:
                             effect_date=row[3],
                             created_at=row[4],
                             user_id=row[5],
-                            category_name=row[6])
+                            cat_id=row[6],
+                            cat_name=row[7])
             incomes.append(income)
 
         return incomes
     except TypeError:
         return data
-# get income by id
-def get_income_by_id(income_id: int) -> Income:
+
+
+def get_income_by_id(income_id: int) -> Income | None:
+    """Function to get an Income by the id
+
+    Parameters:
+        income_id: int
+
+    Returns:
+        An Income object
+    """
     conn, cur = db_connect()
     command = '''SELECT
                     i.id,
@@ -339,6 +546,7 @@ def get_income_by_id(income_id: int) -> Income:
                     i.effect_date,
                     i.created_at,
                     i.user_id,
+                    i.category_id,
                     c.name as category_name 
                  FROM
                     income i
@@ -358,12 +566,21 @@ def get_income_by_id(income_id: int) -> Income:
                       effect_date=data[3],
                       created_at=data[4],
                       user_id=data[5],
-                      category_name=data[6])
+                      cat_id=data[6],
+                      cat_name=data[7])
     except TypeError:
         return data
 
-# get incomes by category
-def get_income_by_category(category_id: int) -> list[Income]:
+
+def get_income_by_category(cat_id: int) -> list[Income] | None:
+    """Function to get a list of Income objects by category
+
+    Parameters:
+        cat_id: Int
+
+    Returns:
+        A list of Income objects
+    """
     conn, cur = db_connect()
     command = '''SELECT
                     i.id,
@@ -372,6 +589,7 @@ def get_income_by_category(category_id: int) -> list[Income]:
                     i.effect_date,
                     i.created_at,
                     i.user_id,
+                    i.category_id,
                     c.name as category_name
                  FROM
                     income i
@@ -381,7 +599,7 @@ def get_income_by_category(category_id: int) -> list[Income]:
                     i.category_id = c.id
                  WHERE
                     c.id = ?'''
-    cur.execute(command, (category_id, ))
+    cur.execute(command, (cat_id, ))
     data = cur.fetchall()
     conn.close()
     incomes = []
@@ -393,16 +611,75 @@ def get_income_by_category(category_id: int) -> list[Income]:
                             effect_date=row[3],
                             created_at=row[4],
                             user_id=row[5],
-                            category_name=row[6])
+                            cat_id=row[6],
+                            cat_name=row[7])
             incomes.append(income)
 
         return incomes
+
     except TypeError:
         return data
 
-### EXPENSE
-# create expense
-def create_expense(expense: Expense, category_id: int=None, goal_id: int=None) -> None:
+
+def get_income_by_month(month: str) -> list[Income] | None:
+    """Function to get a list of Income objects by month
+
+    Parameters:
+        month: Str - format 'YY-MM'
+
+    Returns:
+        A list of Expense objects sharing a given month and category
+    """
+    conn, cur = db_connect()
+    command = '''SELECT
+                        i.id,
+                        i.name,
+                        i.amount,
+                        i.effect_date,
+                        i.created_at,
+                        i.user_id,
+                        i.category_id,
+                        c.name as category_name
+                     FROM
+                        income i
+                     INNER JOIN
+                        category c
+                     ON
+                        i.category_id = c.id
+                     WHERE
+                        i.effect_date = ?'''
+    cur.execute(command, (month, ))
+    data = cur.fetchall()
+    conn.close()
+    incomes = []
+    try:
+        for row in data:
+            income = Income(id=row[0],
+                            name=row[1],
+                            amount=row[2],
+                            effect_date=row[3],
+                            created_at=row[4],
+                            user_id=row[5],
+                            cat_id=row[6],
+                            cat_name=row[7])
+            incomes.append(income)
+
+        return incomes
+
+    except TypeError:
+        return data
+
+
+##### EXPENSE #####
+def create_expense(expense: Expense) -> int:
+    """Function to create an Expense entry and return the id
+
+    Parameters:
+        expense: Expense
+
+    Returns:
+        An Integer - Expense id
+    """
     conn, cur = db_connect()
     command = '''INSERT INTO expense(name, amount, effect_date, user_id, category_id, goal_id)
                     VALUES(?, ?, ?, ?, ?, ?)'''
@@ -410,14 +687,22 @@ def create_expense(expense: Expense, category_id: int=None, goal_id: int=None) -
                           expense.amount,
                           expense.effect_date,
                           expense.user_id,
-                          category_id,
-                          goal_id))
+                          expense.cat_id,
+                          expense.goal_id))
     conn.commit()
-    conn.close()
     print(f'expense: {expense.name}, has been created')
+    expense_id = cur.lastrowid
+    conn.close()
 
-# update expense
-def update_expense(expense: Expense, category_id, goal_id) -> None:
+    return expense_id
+
+
+def update_expense(expense: Expense) -> None:
+    """Function to update an Expense entry
+
+    Parameters:
+        expense: Expense
+    """
     conn, cur = db_connect()
     command = '''UPDATE 
                     expense
@@ -432,15 +717,20 @@ def update_expense(expense: Expense, category_id, goal_id) -> None:
     cur.execute(command, (expense.name,
                           expense.amount,
                           expense.effect_date,
-                          category_id,
-                          goal_id,
+                          expense.cat_id,
+                          expense.goal_id,
                           expense.id))
     conn.commit()
     conn.close()
     print(f'expense: {expense.id}, has been updated')
 
-# delete expense
+
 def delete_expense(expense_id: int) -> None:
+    """Function to delete an Expense entry
+
+    Parameters:
+        expense_id: Int
+    """
     conn, cur = db_connect()
     command = '''DELETE FROM expense WHERE id = ?'''
     cur.execute(command, (expense_id, ))
@@ -448,8 +738,16 @@ def delete_expense(expense_id: int) -> None:
     conn.close()
     print(f'expense: {expense_id}, has been deleted')
 
-# get all user's expenses
-def get_user_expenses(user_id: int) -> list[Expense]:
+
+def get_user_expenses(user_id: int) -> list[Expense] | None:
+    """Function to get a list of user's Expense objects
+
+    Parameters:
+        user_id: int
+
+    Returns:
+        A list of Expense objects
+    """
     conn, cur = db_connect()
     command = '''SELECT 
                     e.id,
@@ -458,7 +756,9 @@ def get_user_expenses(user_id: int) -> list[Expense]:
                     e.effect_date,
                     e.created_at,
                     e.user_id,
+                    e.category_id,
                     c.name as category_name,
+                    e.goal_id,
                     g.name as goal_name
                 FROM 
                     expense e 
@@ -475,7 +775,7 @@ def get_user_expenses(user_id: int) -> list[Expense]:
     cur.execute(command, (user_id, ))
     data = cur.fetchall()
     conn.close()
-    expenses = []
+    expenses = list()
     try:
         for row in data:
             expense = Expense(id=row[0],
@@ -484,15 +784,25 @@ def get_user_expenses(user_id: int) -> list[Expense]:
                               effect_date=row[3],
                               created_at=row[4],
                               user_id=row[5],
-                              category_name=row[6],
-                              goal_name=row[7])
+                              cat_id=row[6],
+                              cat_name=row[7],
+                              goal_id=row[8],
+                              goal_name=row[9])
             expenses.append(expense)
         return expenses
     except TypeError:
         return data
 
-# get expense by id
-def get_expense_by_id(expense_id: int) -> Expense:
+
+def get_expense_by_id(expense_id: int) -> Expense | None:
+    """Function to get an Expense object by the id
+
+    Parameters:
+        expense_id: Int
+
+    Returns:
+        An Expense object
+    """
     conn, cur = db_connect()
     command = '''SELECT
                     e.id,
@@ -501,7 +811,9 @@ def get_expense_by_id(expense_id: int) -> Expense:
                     e.effect_date,
                     e.created_at,
                     e.user_id,
+                    e.category_id,
                     c.name as category_name,
+                    e.goal_id,
                     g.name as goal_name
                 FROM 
                     expense e
@@ -525,13 +837,23 @@ def get_expense_by_id(expense_id: int) -> Expense:
                        effect_date=data[3],
                        created_at=data[4],
                        user_id=data[5],
-                       category_name=data[6],
-                       goal_name=data[7])
+                       cat_id=data[6],
+                       cat_name=data[7],
+                       goal_id=data[8],
+                       goal_name=data[9])
     except TypeError:
         return data
 
-# get expenses by category
-def get_expenses_by_category(category_id: int):
+
+def get_expenses_by_category(cat_id: int) -> list[Expense]:
+    """Function to get a list of Expense objects by category id
+
+    Parameters:
+        cat_id: Int
+
+    Returns:
+        A list of Expense objects
+    """
     conn, cur = db_connect()
     command = '''SELECT
                     e.id,
@@ -540,7 +862,9 @@ def get_expenses_by_category(category_id: int):
                     e.effect_date,
                     e.created_at,
                     e.user_id,
+                    e.category_id,
                     c.name as category_name,
+                    e.goal_id,
                     g.name as goal_name
                  FROM
                     expense e
@@ -554,10 +878,10 @@ def get_expenses_by_category(category_id: int):
                     e.goal_id = g.id
                  WHERE
                     e.category_id = ?'''
-    cur.execute(command, (category_id, ))
+    cur.execute(command, (cat_id, ))
     data = cur.fetchall()
     conn.close()
-    expenses = []
+    expenses = list()
     try:
         for row in data:
             expense = Expense(id=row[0],
@@ -566,16 +890,25 @@ def get_expenses_by_category(category_id: int):
                               effect_date=row[3],
                               created_at=row[4],
                               user_id=row[5],
-                              category_name=row[6],
-                              goal_name=row[7])
+                              cat_id=row[6],
+                              cat_name=row[7],
+                              goal_id=row[8],
+                              goal_name=row[9])
             expenses.append(expense)
         return expenses
     except TypeError:
         return data
 
 
-# get expenses by current month
-def get_expenses_by_month(current_month: str, category_id: int):
+def get_expenses_by_goal(goal_id: int) -> list[Expense]:
+    """Function to get a list of Expense objects by goal id
+
+    Parameters:
+        goal_id: Int
+
+    Returns:
+        A list of Expense objects
+    """
     conn, cur = db_connect()
     command = '''SELECT
                     e.id,
@@ -584,7 +917,9 @@ def get_expenses_by_month(current_month: str, category_id: int):
                     e.effect_date,
                     e.created_at,
                     e.user_id,
+                    e.category_id,
                     c.name as category_name,
+                    e.goal_id,
                     g.name as goal_name
                  FROM
                     expense e
@@ -597,12 +932,9 @@ def get_expenses_by_month(current_month: str, category_id: int):
                  ON
                     e.goal_id = g.id
                  WHERE
-                    e.effect_date LIKE ?
-                 AND
-                    e.category_id = ?'''
-    cur.execute(command, (current_month + '%', category_id, ))
+                    e.goal_id = ?'''
+    cur.execute(command, (goal_id, ))
     data = cur.fetchall()
-    conn.close()
     expenses = []
     try:
         for row in data:
@@ -612,8 +944,65 @@ def get_expenses_by_month(current_month: str, category_id: int):
                               effect_date=row[3],
                               created_at=row[4],
                               user_id=row[5],
-                              category_name=row[6],
-                              goal_name=row[7])
+                              cat_id=row[6],
+                              cat_name=row[7],
+                              goal_id=row[8],
+                              goal_name=row[9])
+            expenses.append(expense)
+        return expenses
+    except TypeError:
+        return data
+
+
+def get_expenses_by_month(month: str) -> list[Expense] | None:
+    """Function to get a list of Expense objects by month
+
+    Parameters:
+        month: Str - format 'YY-MM'
+
+    Returns:
+        A list of Expense objects sharing a given month and category
+    """
+    conn, cur = db_connect()
+    command = '''SELECT
+                    e.id,
+                    e.name,
+                    e.amount,
+                    e.effect_date,
+                    e.created_at,
+                    e.user_id,
+                    e.category_id,
+                    c.name as category_name,
+                    e.goal_id,
+                    g.name as goal_name
+                 FROM
+                    expense e
+                 LEFT JOIN
+                    category c
+                 ON
+                    e.category_id = c.id
+                 LEFT JOIN
+                    goal g
+                 ON
+                    e.goal_id = g.id
+                 WHERE
+                    e.effect_date LIKE ?'''
+    cur.execute(command, (month + '%', ))
+    data = cur.fetchall()
+    conn.close()
+    expenses = list()
+    try:
+        for row in data:
+            expense = Expense(id=row[0],
+                              name=row[1],
+                              amount=row[2],
+                              effect_date=row[3],
+                              created_at=row[4],
+                              user_id=row[5],
+                              cat_id=row[6],
+                              cat_name=row[7],
+                              goal_id=row[8],
+                              goal_name=row[9])
             expenses.append(expense)
         return expenses
     except TypeError:

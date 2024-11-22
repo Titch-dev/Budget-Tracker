@@ -55,13 +55,23 @@ ADD_CATEGORY = '''
                              ADD A CATEGORY:
 '''
 
+CATEGORY_OPTION = '''
+************************************************************************
+        What would you like to do with category: {}
+    
+                        1. Update Budget
+                        2. Delete Category
+                        Any other key. Cancel
+                    
+                            Option: '''
+
 SELECT_CATEGORY = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                        Select a category from the above
-                    Enter the reference or one of the below:
+                    Select a category from the above
+                Enter the reference or one of the below:
                         
                         {}. Create a new category
-                        {}. Do not assign a category
+                   Any Key. Do not assign a category
                         
                             Option: '''
 
@@ -87,19 +97,95 @@ SELECT_GOAL = '''
                         the below options:
 
                         {}. Create a new goal
-                        {}. Cancel
+                   Any Key. Do not assign a goal
                         
                         Option: '''
 
+GOAL_SUMMARY = '''
+------------------------------------------------------------------------
+                            GOAL SUMMARY:
+    
+    Goal Name:          {}
+    Goal Description:
+        {}
+    Goal Balance:      R{}
+    Goal Target:       R{}      Remaining Target:  R{}
+    Goal End:       {}      Remaining Time:     {}days
+    
+    Advise saving an average of R{} per week to achieve your goal 
+------------------------------------------------------------------------
+                    Press return key to continue'''
+
 ### Income
-ADD_INCOME = '''
+INCOME_ADD = '''
 ************************************************************************
                              ADD AN INCOME:
 '''
 
+INCOME_VIEW = '''
+************************************************************************
+            Please select from one of the following options:
+            
+                    1. Retrieve all incomes
+                    2. Retrieve income by month
+              Any key. Cancel
+                    
+'''
+
+INCOME_SUMMARY = '''
+------------------------------------------------------------------------
+                          INCOME SUMMARY:
+'''
+
+INCOME_SELECT = '''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        Please enter one of the above references to view an
+            income or enter any other key to cancel
+                        
+                        Option: '''
+
+INCOME_OPTION = '''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        1. Delete Income
+                        Any Key. Cancel
+                        
+                        Option: '''
 
 ### Expense
 ADD_EXPENSE = '''
 ************************************************************************
                              ADD AN EXPENSE:
 '''
+
+EXPENSE_VIEW = '''
+************************************************************************
+            Please select from one of the following options:
+
+                    1. Retrieve all expenses
+                    2. Retrieve expenses by month
+                    Any other key. Cancel
+
+'''
+
+EXPENSE_SUMMARY = '''
+------------------------------------------------------------------------
+                        {} EXPENSE SUMMARY:
+                           
+                           Spent
+    Total amount:          R{}
+    Categories'''
+
+SELECT_EXPENSE = '''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        Please enter one of the above references to view an
+            expense or enter any other key to cancel
+
+                        Option: '''
+
+EXPENSE_OPTION = '''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    1. Update expense amount
+                    2. Delete expense
+                    Any other key. Cancel
+                        
+                        Option: '''

@@ -1,6 +1,7 @@
 from datetime import datetime
 
-class Goal():
+
+class Goal:
     def __init__(self, id: int, name: str, desc: str, target: float, end_date: datetime, created_at: datetime, user_id: int) -> None:
         self.id = id
         self.name = name
@@ -23,30 +24,23 @@ class Goal():
     def __repr__(self):
         return f'<Goal id={self.id}, name={self.name}, desc={self.desc}, target={self.target}, end_date={self.end_date}, created_at={self.created_at}, user_id={self.user_id}'
 
-    def display(self, reference=None):
+    def display_short(self, reference=None):
         goal = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         if reference:
             goal += f'                                                       reference # {reference} \n'
-        goal += f'Goal ID:            {self.id}\n'\
-                f'Goal name:          {self.name}\n'\
+        goal += f'Goal name:          {self.name}\n'\
                 f'Goal description:   {self.desc}\n'\
                 f'Goal target:        {self.target}\n'\
-                f'Goal end date:      {self.end_date}\n'\
-                f'Goal created:       {self.created_at}\n'\
                 '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         print(goal)
 
-def get_goal():
-    pass
-
-
-def add_goal():
-    pass
-
-
-def update_goal():
-    pass
-
-
-def delete_goal():
-    pass
+    def display_long(self):
+        goal = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\
+                f'Goal ID:            {self.id}\n' \
+                f'Goal name:          {self.name}\n' \
+                f'Goal description:   {self.desc}\n' \
+                f'Goal target:        {self.target}\n' \
+                f'Goal end date:      {self.end_date}\n' \
+                f'Goal created:       {self.created_at}\n' \
+                '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+        print(goal)

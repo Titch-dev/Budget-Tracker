@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 class User:
     def __init__(self, id: int, email: str, password: str, created_at: datetime, last_login: datetime) -> None:
         self.id = id
@@ -17,7 +18,8 @@ class User:
                    last_login=None)
     
     def __repr__(self):
-        return f'<User id={self.id}, email={self.email}, password={self.password}, created_at={self.created_at}, last_login={self.last_login}>'
+        return (f'<User id={self.id}, email={self.email}, password={self.password}, '
+                f'created_at={self.created_at}, last_login={self.last_login}>')
     
     def display(self):
         user = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\

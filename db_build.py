@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS category(
     name VARCHAR(100) UNIQUE NOT NULL,
     desc VARCHAR(500),
     budget FLOAT DEFAULT 0.00,
+    cat_type TEXT NOT NULL CHECK (cat_type IN ('income', 'expense')),
     created_at TEXT DEFAULT (DATETIME('now')),
     user_id INTEGER,
     CONSTRAINT fk_user
@@ -36,17 +37,17 @@ CREATE TABLE IF NOT EXISTS category(
 '''
 
 INSERT_CATEGORIES = '''
-INSERT INTO category (name, desc, budget, user_id)
-    VALUES(?, ?, ?, ?)
+INSERT INTO category (name, desc, budget, cat_type, user_id)
+    VALUES(?, ?, ?, ?, ?)
 '''
 
 INITIAL_CATEGORIES = [
-    ("Salary", "Monthly salary payment", 0.00, 1),
-    ("Rent", "Monthly rent payment.", 0.00, 1),
-    ("Utilities", "Electricity, water, and gas bills.", 0.00, 1),
-    ("Dining Out", "Eating out at restaurants and cafes.", 150.00, 1),
-    ("Health & Fitness", "Gym membership and health-related expenses.", 0.00, 1),
-    ("Goals", "Working towards financial goals.", 0.00, 1)
+    ("Salary", "Monthly salary payment", 0.00, 'income', 1),
+    ("Rent", "Monthly rent payment.", 0.00, 'expense', 1),
+    ("Utilities", "Electricity, water, and gas bills.", 0.00, 'expense', 1),
+    ("Dining Out", "Eating out at restaurants and cafes.", 150.00, 'expense', 1),
+    ("Health & Fitness", "Gym membership and health-related expenses.", 0.00, 'expense', 1),
+    ("Goals", "Working towards financial goals.", 0.00, 'expense', 1)
 ]
 
 CREATE_GOAL_TABLE = '''

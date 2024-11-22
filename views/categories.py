@@ -2,66 +2,101 @@ from models.category import Category
 
 from datetime import datetime
 
-from db_access import get_user_categories, create_category, update_category, get_expenses_by_month
+from db_access import get_user_categories, create_category, update_category, get_expenses_by_month, \
+    get_user_categories_by_type, get_category_by_id, get_expenses_by_category, update_expense, delete_category
 
-from general_utils import enumerate_object, display_formatter
+from general_utils import display_formatter
 
 from templates import SELECT_CATEGORY, ADD_CATEGORY, CATEGORY_BUDGET
 
 
-def select_user_category(user_id: int):
+def select_user_category(user_id: int, cat_type: str) -> Category | None:
 
-    categories = get_user_categories(user_id)
+    categories = get_user_categories_by_type(user_id, cat_type)
 
     ref_dict = dict()
 
     for ref, category in enumerate(categories, start=1):
-        category.display(ref) # adding 1 ensures that it'll be displayed
+        category.display_short(ref)
         ref_dict[ref] = category
 
     option = len(categories)
     # need an option if the length of categories is zero display nothing
-    category_choice = int(input(display_formatter(SELECT_CATEGORY, option + 1, option + 2)))
+    choice = int(input(display_formatter(SELECT_CATEGORY, option + 1, cat_type, option + 2)))
 
-    if category_choice in ref_dict:
-        return ref_dict[category_choice].id  # return the category id
-    elif category_choice == option + 1:
-        new_category = add_category()
-        return new_category.id
-    elif category_choice == option + 2:
+    if choice in ref_dict:
+        return ref_dict[choice]  # return the category
+    elif choice == option + 1:
+        new_category = add_category(user_id, cat_type)
+        return new_category
+    elif choice == option + 2:
         return None
 
 
-def add_category(user_id: int) -> Category:
+def select_category(user_id: int, categories: list[Category]) -> Category | None:
+
+    ref_dict = dict()
+
+    for ref, category in enumerate(categories, start=1):
+        category.display_short(ref)
+        ref_dict[ref] = category
+
+    option = len(categories) + 1
+
+    category_choice = int(input(display_formatter(SELECT_CATEGORY, option)))
+
+    if category_choice in ref_dict:
+        return ref_dict[category_choice]
+    elif category_choice == option:
+        return add_category(user_id)
+    else:
+        return None
+
+
+def add_category(user_id: int, cat_type: str) -> Category:
+    """Function to take user input, instantiate Category object,
+    and call db_access.create_category
+
+    Parameters:
+        user_id: Int,
+        cat_type: Str
+
+    Returns:
+        A newly created Category object
+    """
     print(ADD_CATEGORY)
     name = input('Enter a name for the category: ')
     # TODO: validate that name is unique
     desc = input('Enter a short description: ')
     budget = float(input('Enter a monthly budget for this category: '))
-    category = Category.create(name=name,
-                               desc=desc,
-                               budget=budget,
-                               user_id=user_id)
-    cat_id = create_category(category)
+    new_category = Category.create(name=name,
+                                   desc=desc,
+                                   budget=budget,
+                                   cat_type=cat_type,
+                                   user_id=user_id)
+
+    category_id = create_category(new_category)
+    category = get_category_by_id(category_id)
+
+    return category
 
 
-def set_category_budget(user_id: int):
-    print('Select from the below categories to amend the budget')
-    categories = get_user_categories(user_id)
+def remove_delete_category(cat_id: int) -> None:
+    expenses = get_expenses_by_category(cat_id)
 
-    ref_dict = dict()
+    for expense in expenses:
+        expense.cat_id = None
+        update_expense(expense)
 
-    for ref, category in enumerate(categories, start=1):
-        category.display(ref)
-        ref_dict[ref] = category
+    # Delete category
+    delete_category(cat_id)
 
-    category_choice = int(input('Please input the respective reference number to alter the budget for: '))
 
-    category = ref_dict[category_choice]
+def set_category_budget(category: Category):
 
-    budget = float(input(f'Enter the monthly budget amount for {category.name}: '))
+    new_budget = float(input(f'Enter the monthly budget amount for {category.name}: '))
 
-    category.budget = budget
+    category.budget = new_budget
 
     update_category(category)
 
@@ -72,7 +107,7 @@ def view_category_budget(user_id: int):
     ref_dict = dict()
 
     for ref, category in enumerate(categories, start=1):
-        category.display(ref)
+        category.display_short(ref)
         ref_dict[ref] = category
 
     choice = int(input('Please select from the above categories to view this month\'s budget: '))
@@ -99,5 +134,3 @@ def view_category_budget(user_id: int):
                             spent,
                             remaining,
                             category.budget))
-
-

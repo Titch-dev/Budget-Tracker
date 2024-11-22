@@ -1,4 +1,5 @@
 # Views
+from models.user import User
 from views.login import login
 from views.register import register
 from views.expenses import add_expense, view_expenses, view_expenses_by_category
@@ -16,7 +17,8 @@ from templates import WELCOME_MENU, DASHBOARD_MENU, LOGOUT_MESSAGE, ERROR_MESSAG
 ### Application start ###
 def app_logic():
 
-    user = None
+    # user = None
+    user = User(id=1, email='test@test.com', password='password', created_at=None, last_login=None)
 
     while not user:
         menu_choice = input(WELCOME_MENU)
