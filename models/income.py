@@ -50,18 +50,3 @@ class Income:
                   f'Income created:     {self.created_at}\n'\
                   '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         print(income)
-
-def get_income():
-    pass
-
-def get_all_incomes():
-    pass
-
-def add_income():
-    pass
-
-def update_income():
-    pass
-
-def delete_income():
-    pass

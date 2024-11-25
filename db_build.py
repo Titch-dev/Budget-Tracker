@@ -6,7 +6,7 @@ cur = conn.cursor()
 CREATE_USER_TABLE = '''
 CREATE TABLE IF NOT EXISTS user(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
     created_at TEXT DEFAULT (DATETIME('now')),
     last_login TEXT DEFAULT NULL
@@ -14,16 +14,16 @@ CREATE TABLE IF NOT EXISTS user(
 '''
 
 INSERT_USER = '''
-INSERT INTO user (email, password)
+INSERT INTO user (username, password)
     VALUES(?, ?)
 '''
 
-INITIAL_USER = ('test@test.com', 'password')
+INITIAL_USER = ('McFly', 'delorean')
 
 CREATE_CATEGORY_TABLE = '''
 CREATE TABLE IF NOT EXISTS category(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
     desc VARCHAR(500),
     budget FLOAT DEFAULT 0.00,
     cat_type TEXT NOT NULL CHECK (cat_type IN ('income', 'expense')),
@@ -42,8 +42,8 @@ INSERT INTO category (name, desc, budget, cat_type, user_id)
 '''
 
 INITIAL_CATEGORIES = [
-    ("Salary", "Monthly salary payment", 0.00, 'income', 1),
-    ("Rent", "Monthly rent payment.", 0.00, 'expense', 1),
+    ("Salary", "Monthly salary payment.", 0.00, 'income', 1),
+    ("Rent", "Monthly rental payment.", 0.00, 'expense', 1),
     ("Utilities", "Electricity, water, and gas bills.", 0.00, 'expense', 1),
     ("Dining Out", "Eating out at restaurants and cafes.", 150.00, 'expense', 1),
     ("Health & Fitness", "Gym membership and health-related expenses.", 0.00, 'expense', 1),
@@ -53,7 +53,7 @@ INITIAL_CATEGORIES = [
 CREATE_GOAL_TABLE = '''
 CREATE TABLE IF NOT EXISTS goal(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
     desc VARCHAR(500),
     target FLOAT DEFAULT 0.00,
     end_date TEXT,

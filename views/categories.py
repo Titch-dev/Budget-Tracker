@@ -3,134 +3,226 @@ from models.category import Category
 from datetime import datetime
 
 from db_access import get_user_categories, create_category, update_category, get_expenses_by_month, \
-    get_user_categories_by_type, get_category_by_id, get_expenses_by_category, update_expense, delete_category
+    get_user_categories_by_type, get_category_by_id, get_expenses_by_category, update_expense, delete_category, \
+    get_income_by_category, update_income, update_income_category_to_null, update_expenses_category_to_null
 
-from general_utils import display_formatter
+from general_utils import display_formatter, date_formatter, pause_terminal, amount_validator
 
 from templates import SELECT_CATEGORY, ADD_CATEGORY, CATEGORY_BUDGET
 
 
-def select_user_category(user_id: int, cat_type: str) -> Category | None:
+def is_category_name_taken(user_id: int, name: str) -> bool:
+    """Returns True if name already taken, and False if not
 
-    categories = get_user_categories_by_type(user_id, cat_type)
+    Parameters:
+        user_id (int): The ID of the user to filter by
+        name (str): The category name to check if already exists
 
-    ref_dict = dict()
+    Returns:
+        True | False: True if name exists and False if not"""
+    categories = get_user_categories(user_id)
+    try:
+        for category in categories:
+            if name.strip() == category.name:
+                return True
+        return False
+    except TypeError:
+        return False
 
-    for ref, category in enumerate(categories, start=1):
-        category.display_short(ref)
-        ref_dict[ref] = category
 
-    option = len(categories)
-    # need an option if the length of categories is zero display nothing
-    choice = int(input(display_formatter(SELECT_CATEGORY, option + 1, cat_type, option + 2)))
+def add_category(user_id: int, cat_type: str) -> Category | None:
+    """Take user input, return a newly created category
 
-    if choice in ref_dict:
-        return ref_dict[choice]  # return the category
-    elif choice == option + 1:
-        new_category = add_category(user_id, cat_type)
-        return new_category
-    elif choice == option + 2:
+    Parameters:
+        user_id (int): The user's ID.
+        cat_type (str): The type of category to select.
+
+    Returns:
+        Category: A newly created category
+    """
+    print(ADD_CATEGORY)
+
+    # fullback mechanism: Get and validate a category name
+    while True:
+        name = input('Enter a name for the category: ').strip()
+        if not name:
+            print('Name cannot be empty.')
+            continue
+        if is_category_name_taken(user_id, name):
+            print('Category name already taken.')
+            continue
+        break
+
+    # Not a required field
+    desc = input('Enter a short description for the category: ').strip()
+
+    # Validate a budget
+    budget = amount_validator(prompt='budget')
+
+    # Create the new category
+    new_category = Category.create(
+        name=name,
+        desc=desc,
+        budget=budget,
+        cat_type=cat_type,
+        user_id=user_id)
+
+    # Save and retrieve the category
+    try:
+        category_id = create_category(new_category)
+        category = get_category_by_id(category_id)
+        return category
+    except Exception as e:
+        print(f'An error has occurred while creating the category: {e}')
         return None
 
 
-def select_category(user_id: int, categories: list[Category]) -> Category | None:
+def select_user_category(user_id: int, cat_type: str) -> Category | None:
+    """Take User input and return a Category.
 
-    ref_dict = dict()
+    Parameters:
+        user_id (int): The user's ID.
+        cat_type (str): The type of category to select.
 
-    for ref, category in enumerate(categories, start=1):
+    Returns:
+        Category | None: The selected category, a newly added one, or None.
+    """
+    categories = get_user_categories_by_type(user_id, cat_type)
+
+    if not categories:
+        print("No categories available.")
+        choice = input("Would you like to add a new category? (y/n): ").strip().lower()
+        if choice == 'y':
+            return add_category(user_id, cat_type)
+        return None
+
+    ref_dict = {ref: category for ref, category in enumerate(categories, start=1)}
+
+    # Display available categories
+    for ref, category in ref_dict.items():
         category.display_short(ref)
-        ref_dict[ref] = category
 
-    option = len(categories) + 1
+    ADD_OPTION = len(categories) + 1
 
-    category_choice = int(input(display_formatter(SELECT_CATEGORY, option)))
+    try:
+        choice = int(input(display_formatter(SELECT_CATEGORY,ADD_OPTION, cat_type)))
+    except ValueError:
+        return None
 
-    if category_choice in ref_dict:
-        return ref_dict[category_choice]
-    elif category_choice == option:
-        return add_category(user_id)
+    if choice in ref_dict:
+        return ref_dict[choice]  # return the category
+    elif choice == ADD_OPTION:
+        return add_category(user_id, cat_type)
     else:
         return None
 
 
-def add_category(user_id: int, cat_type: str) -> Category:
-    """Function to take user input, instantiate Category object,
-    and call db_access.create_category
+def remove_delete_category(cat_id: int, cat_type: str) -> None:
+    """Remove the category id from income and expense entries, then delete
+    the category
 
     Parameters:
-        user_id: Int,
-        cat_type: Str
-
-    Returns:
-        A newly created Category object
+        cat_id (int): Category ID
+        cat_type (str): The type of category to select
     """
-    print(ADD_CATEGORY)
-    name = input('Enter a name for the category: ')
-    # TODO: validate that name is unique
-    desc = input('Enter a short description: ')
-    budget = float(input('Enter a monthly budget for this category: '))
-    new_category = Category.create(name=name,
-                                   desc=desc,
-                                   budget=budget,
-                                   cat_type=cat_type,
-                                   user_id=user_id)
+    try:
+        # Delete category id from income
+        if cat_type == 'income':
+            update_income_category_to_null(cat_id)
 
-    category_id = create_category(new_category)
-    category = get_category_by_id(category_id)
+        # Delete category id from expenses
+        elif cat_type == 'expense':
+            update_expenses_category_to_null(cat_id)
 
-    return category
-
-
-def remove_delete_category(cat_id: int) -> None:
-    expenses = get_expenses_by_category(cat_id)
-
-    for expense in expenses:
-        expense.cat_id = None
-        update_expense(expense)
-
-    # Delete category
-    delete_category(cat_id)
+        delete_category(cat_id)
+    except Exception as e:
+        print(f'An error had occurred while removing the category: {e}')
 
 
 def set_category_budget(category: Category):
+    """Take user input to set the budget property of a category entry
 
-    new_budget = float(input(f'Enter the monthly budget amount for {category.name}: '))
+    Parameters:
+        category (Category): The category selected for updating"""
 
-    category.budget = new_budget
+    while True:
+        try:
+            new_budget = float(input(f'\nEnter the monthly budget amount for {category.name}: '))
 
-    update_category(category)
+            if new_budget < 0:
+                print('The budget cannot be negative.')
+                continue
+
+            category.budget = new_budget
+            update_category(category)
+            break
+
+        except ValueError:
+            print('Please enter a valid number')
+            continue
 
 
 def view_category_budget(user_id: int):
-    categories = get_user_categories(user_id)
+    """Display the budget information for a selected category
+    for a specific month
 
-    ref_dict = dict()
+    Parameters:
+        user_id (int): The ID of the user
+    """
 
-    for ref, category in enumerate(categories, start=1):
+    # Prompt user to select a month
+    print('Please choose the month you wish to see the budget for a category')
+    search_date = date_formatter(full_date=False)  # Returns a 'YYYY-MM' formatted string
+
+    # Retrieve the expenditures for the month
+    expenses = get_expenses_by_month(search_date)
+    if not expenses:
+        print(f'No expenses found for {search_date}')
+        return
+
+    # Retrieve user expense categories
+    categories = get_user_categories_by_type(user_id, 'expense')
+    if not categories:
+        print('No expense categories exist, please create add one first')
+        return
+
+    # Display categories and allow user to select one
+    ref_dict = {ref: category for ref, category in enumerate(categories)}
+    for ref, category in ref_dict.items():
         category.display_short(ref)
-        ref_dict[ref] = category
 
-    choice = int(input('Please select from the above categories to view this month\'s budget: '))
+    while True:
+        try:
+            choice = int(input('Please select from the above categories to view budget: '))
+            category = ref_dict.get(choice)
+            if not category:
+                print('Please enter a valid reference number')
+                continue
+            break
+        except ValueError:
+            print('Please enter a valid reference number')
+            continue
 
-    category = ref_dict[choice]
-
-    current_date = datetime.now()
-    month = current_date.strftime('%B')
-    search_date = current_date.strftime('%Y-%m')
-
-    expenses = get_expenses_by_month(search_date, category.id)
+    # cycle through expenditures
     spent = 0
-
     for expense in expenses:
-        date = datetime.fromisoformat(expense.effect_date)
-        if date <= current_date:
+        if expense.cat_id == category.id:
             spent += expense.amount
 
-    remaining = category.budget - spent
+    # Determine the remaining budget
+    if category.budget == 0:
+        remaining = 'Budget not set'
+    else:
+        remaining = f'R{category.budget - spent:.2f}'
 
+    # Display budget information
+    month = datetime.strptime(search_date, '%Y-%m').strftime('%B')
+    year = datetime.strptime(search_date, '%Y-%m').strftime('%Y')
     print(display_formatter(CATEGORY_BUDGET,
                             category.name,
                             month,
+                            year,
                             spent,
                             remaining,
                             category.budget))
+    pause_terminal()

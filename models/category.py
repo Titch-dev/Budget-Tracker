@@ -28,32 +28,18 @@ class Category:
     def display_short(self, reference=None):
         category = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         if reference:
-            category += f'                                                       reference #{reference}\n'
-        category += f'Category name:              {self.name}\n'\
-                    f'Category description:       {self.desc}\n'\
-                    f'Category monthly budget:    {self.budget}\n'\
-                    '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+            category += f'                                                           ref # {reference}\n'
+        category += (f'Category name:   {self.name}\n'
+                     f'Monthly Budget:  {'Not set' if self.budget == 0.00 else f'{self.budget}'}\n'
+                     f'- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
         print(category)
 
     def display_long(self):
-        category = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\
-                    f'Category ID:                {self.id}\n'\
-                    f'Category name:              {self.name}\n'\
-                    f'Category description:       {self.desc}\n'\
-                    f'Category monthly budget:    {self.budget}\n'\
-                    f'Category type:              {self.cat_type}\n'\
-                    '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+        category = ('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+                    f'Category name:     {self.name}\n'
+                    f'Category type:     {self.cat_type}\n'
+                    f'Description:       '
+                    f'     {self.desc}\n'
+                    f'Monthly budget:    {'Not set' if self.budget == 0.00 else f'{self.budget}'}n'
+                    '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ')
         print(category)
-
-
-def get_category():
-    pass
-
-def add_category():
-    pass
-
-def update_category():
-    pass
-
-def delete_category():
-    pass

@@ -22,7 +22,8 @@ class Goal:
                    user_id=user_id)
     
     def __repr__(self):
-        return f'<Goal id={self.id}, name={self.name}, desc={self.desc}, target={self.target}, end_date={self.end_date}, created_at={self.created_at}, user_id={self.user_id}'
+        return (f'<Goal id={self.id}, name={self.name}, desc={self.desc}, target={self.target}, '
+                f'end_date={self.end_date}, created_at={self.created_at}, user_id={self.user_id}')
 
     def display_short(self, reference=None):
         goal = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'

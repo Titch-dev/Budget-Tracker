@@ -11,8 +11,7 @@ WELCOME_MENU = '''
 
 DASHBOARD_MENU = '''
 ************************************************************************
-        Please input a number corresponding to the options below:
-
+                
                 1. Add expense          
                 2. View expenses
                 3. View expenses by category
@@ -24,8 +23,8 @@ DASHBOARD_MENU = '''
                 9. Set financial goals
                 10. View progress towards financial goals
                 11. Quit
-************************************************************************
-                            Option: '''
+                
+        Enter a number corresponding to the above option: '''
 
 ### General
 ERROR_MESSAGE = '''
@@ -47,6 +46,10 @@ LOGOUT_MESSAGE = '''
 ************************************************************************
 '''
 ### Users
+ADD_USER = '''
+************************************************************************
+                        REGISTRATION:
+'''
 
 
 ### Categories
@@ -67,21 +70,21 @@ CATEGORY_OPTION = '''
 
 SELECT_CATEGORY = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                    Select a category from the above
-                Enter the reference or one of the below:
+            Enter a 'ref' number to select a category above
+                        or choose from below:
                         
-                        {}. Create a new category
-                   Any Key. Do not assign a category
+                        {}. Create a new {} category
+                  Any Key. Cancel
                         
                             Option: '''
 
 CATEGORY_BUDGET = '''
 ------------------------------------------------------------------------
 Category name:          {}
-Current Month:          {}
-Budget spent:          R{}
-Budget remaining:      R{}
-Monthly budget set at: R{}
+Month:                  {} {}
+Spent:                  R{}
+Budget remaining:       {}
+Monthly budget set at:  R{}
 ------------------------------------------------------------------------
 '''
 
@@ -112,9 +115,8 @@ GOAL_SUMMARY = '''
     Goal Target:       R{}      Remaining Target:  R{}
     Goal End:       {}      Remaining Time:     {}days
     
-    Advise saving an average of R{} per week to achieve your goal 
-------------------------------------------------------------------------
-                    Press return key to continue'''
+    {} 
+------------------------------------------------------------------------'''
 
 ### Income
 INCOME_ADD = '''
@@ -134,20 +136,24 @@ INCOME_VIEW = '''
 
 INCOME_SUMMARY = '''
 ------------------------------------------------------------------------
-                          INCOME SUMMARY:
-'''
+                          {} INCOME SUMMARY:
+                           
+                           Spent
+    Total amount:          R{}
+    Categories'''
 
-INCOME_SELECT = '''
+SELECT_INCOME = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        Please enter one of the above references to view an
-            income or enter any other key to cancel
-                        
-                        Option: '''
+        Enter one of the above 'ref' for further info on an income
+                    or enter any other key to cancel
+
+                            Option: '''
 
 INCOME_OPTION = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                        1. Delete Income
-                        Any Key. Cancel
+                    1. Update income amount
+                    2. Delete income
+        Any other key. Cancel
                         
                         Option: '''
 
@@ -177,15 +183,15 @@ EXPENSE_SUMMARY = '''
 
 SELECT_EXPENSE = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        Please enter one of the above references to view an
-            expense or enter any other key to cancel
+    Enter one of the above 'ref' for further info on an expense
+                    or enter any other key to cancel
 
-                        Option: '''
+                            Option: '''
 
 EXPENSE_OPTION = '''
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                     1. Update expense amount
                     2. Delete expense
-                    Any other key. Cancel
+        Any other key. Cancel
                         
                         Option: '''

@@ -14,7 +14,7 @@ from db_access import get_income_by_id, get_user_by_id, get_goal_by_id, \
     update_category, update_expense, update_goal, update_income, update_user, \
     create_user, create_goal, create_category, create_expense, create_income, \
     get_expenses_by_category, get_income_by_category, get_expenses_by_month, get_user_categories_by_type, \
-    get_category_by_name
+    get_category_by_name, update_income_category_to_null, update_expenses_category_to_null
 
 from db_build import CREATE_USER_TABLE, CREATE_CATEGORY_TABLE, CREATE_GOAL_TABLE, \
     CREATE_INCOME_TABLE, CREATE_EXPENSE_TABLE, INSERT_USER, INSERT_CATEGORIES, \
@@ -460,6 +460,23 @@ class TestDBAccess(TestCase):
         self.assertEqual(expected.amount, actual.amount)
         self.assertEqual(expected.cat_name, actual.cat_name)
 
+    def test_update_income_category_to_null(self):
+        expected = Income(id=1,
+                          name="Work Salary",
+                          amount=2000.00,
+                          effect_date="2024-06-25",
+                          created_at=None,
+                          user_id=1,
+                          cat_id=None,
+                          cat_name=None)
+
+        update_income_category_to_null(cat_id=1)
+        actual = get_income_by_id(income_id=1)
+
+        self.assertEqual(expected.id, actual.id)
+        self.assertEqual(expected.cat_id, actual.cat_id)
+        self.assertEqual(expected.cat_name, actual.cat_name)
+
     def test_delete_income(self):
         income_id = 1
         delete_income(income_id)
@@ -750,6 +767,25 @@ class TestDBAccess(TestCase):
         self.assertEqual(expected.name, actual.name)
         self.assertEqual(expected.amount, actual.amount)
         self.assertEqual(expected.effect_date, actual.effect_date)
+
+    def test_update_expenses_category_to_null(self):
+        expected = Expense(id=15,
+                           name="Gym",
+                           amount=75.00,
+                           effect_date="2024-10-02",
+                           created_at=None,
+                           user_id=1,
+                           cat_id=None,
+                           cat_name=None,
+                           goal_id=None,
+                           goal_name=None)
+
+        update_expenses_category_to_null(cat_id=5)
+        actual = get_expense_by_id(15)
+
+        self.assertEqual(expected.id, actual.id)
+        self.assertEqual(expected.cat_id, actual.cat_id)
+        self.assertEqual(expected.cat_name, actual.cat_name)
 
     def test_delete_expense(self):
         expense_id = 1

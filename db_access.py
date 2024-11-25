@@ -21,13 +21,13 @@ def create_user(user: User) -> None:
         user: User object
     """
     conn, cur = db_connect()
-    command = '''INSERT INTO user (email, password) 
+    command = '''INSERT INTO user (username, password) 
                     VALUES (?, ?)'''
-    cur.execute(command, (user.email, 
+    cur.execute(command, (user.username,
                           user.password))
     conn.commit()
     conn.close()
-    print(f'user: {user.email}, has been created')
+    print(f'User: {user.username}, has been created')
 
 
 def update_user(user: User) -> None:
@@ -38,17 +38,17 @@ def update_user(user: User) -> None:
     """
     conn, cur = db_connect()
     command = '''UPDATE user
-                SET email = ?,
+                SET username = ?,
                     password = ?,
                     last_login = ?
                 WHERE id = ?'''
-    cur.execute(command, (user.email,
+    cur.execute(command, (user.username,
                           user.password,
                           user.last_login,
                           user.id))
     conn.commit()
     conn.close()
-    print(f'user: {user.email}, has been updated')
+    print(f'user: {user.username}, has been updated')
 
 
 def delete_user(user_id: int) -> None:
@@ -81,7 +81,7 @@ def get_user_by_id(user_id: int) -> User:
     conn.close()
     try:
         user = User(id=data[0],
-                    email=data[1],
+                    username=data[1],
                     password=data[2],
                     created_at=data[3],
                     last_login=data[4])
@@ -90,23 +90,23 @@ def get_user_by_id(user_id: int) -> User:
         return data
 
 
-def get_user_by_email(email: str) -> User:
-    """Function to get a user entry by email
+def get_user_by_username(username: str) -> User | None:
+    """Get a user entry by username or return None
 
     Parameters:
-        email: Str
+        username (str): The username of the user to filter by.
 
     Returns:
-        User object
+        User | None:
     """
     conn, cur = db_connect()
-    command = '''SELECT * FROM user WHERE email = ?'''
-    cur.execute(command, (email,))
+    command = '''SELECT * FROM user WHERE username = ?'''
+    cur.execute(command, (username,))
     data = cur.fetchone()
     conn.close()
     try:
         return User(id=data[0],
-                    email=data[1],
+                    username=data[1],
                     password=data[2],
                     created_at=data[3],
                     last_login=data[4])
@@ -297,7 +297,7 @@ def create_goal(goal: Goal) -> int:
     """Function to create a Goal and return the id
 
     Parameters:
-        goal: Goal
+        goal (Goal):
 
     Returns:
         An Integer - Goal id
@@ -467,6 +467,25 @@ def update_income(income: Income) -> None:
     print(f'income: {income.id}, has been updated')
 
 
+def update_income_category_to_null(cat_id: int):
+    conn, cur = db_connect()
+    try:
+        command = '''UPDATE
+                            income
+                        SET
+                            category_id = NULL
+                        WHERE
+                            category_id = ?'''
+        cur.execute(command, (cat_id,))
+        conn.commit()
+        rows_affected = cur.rowcount
+        print(f"{rows_affected} income entries updated.")
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+    finally:
+        conn.close()
+
+
 def delete_income(income_id: int) -> None:
     """Function to delete an Income entry
 
@@ -478,7 +497,7 @@ def delete_income(income_id: int) -> None:
     cur.execute(command, (income_id, ))
     conn.commit()
     conn.close()
-    print(f'income: {income_id}, has been dleeted')
+    print(f'income: {income_id}, has been deleted')
 
 
 def get_user_income(user_id: int) -> list[Income] | None:
@@ -550,7 +569,7 @@ def get_income_by_id(income_id: int) -> Income | None:
                     c.name as category_name 
                  FROM
                     income i
-                 INNER JOIN
+                 LEFT JOIN
                     category c
                  ON
                     i.category_id = c.id
@@ -723,6 +742,25 @@ def update_expense(expense: Expense) -> None:
     conn.commit()
     conn.close()
     print(f'expense: {expense.id}, has been updated')
+
+
+def update_expenses_category_to_null(cat_id) -> None:
+    conn, cur = db_connect()
+    try:
+        command = '''UPDATE 
+                        expense
+                    SET
+                        category_id = null
+                    WHERE
+                        category_id = ?'''
+        cur.execute(command, (cat_id,))
+        conn.commit()
+        rows_affected = cur.rowcount
+        print(f'{rows_affected} expense entries updated')
+    except sqlite3.Error as e:
+        print(f'An error has occurred: {e}')
+    finally:
+        conn.close()
 
 
 def delete_expense(expense_id: int) -> None:

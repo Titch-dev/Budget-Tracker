@@ -30,16 +30,10 @@ class Expense:
                    goal_name=None)
     
     def __repr__(self):
-        return (f'<Expense id={self.id}, '
-                f'name={self.name}, '
-                f'amount={self.amount}, '
-                f'effect_date={self.effect_date}, '
-                f'created_at={self.created_at}, '
-                f'user_id={self.user_id}, '
-                f'cat_id={self.cat_id}, '
-                f'category_name={self.cat_name}, '
-                f'goal_id={self.goal_id}, '
-                f'goal_name={self.goal_name}>')
+        return (f'<Expense id={self.id}, name={self.name}, amount={self.amount}, '
+                f'effect_date={self.effect_date}, created_at={self.created_at}, '
+                f'user_id={self.user_id}, cat_id={self.cat_id}, category_name={self.cat_name}, '
+                f'goal_id={self.goal_id}, goal_name={self.goal_name}>')
 
     def display_short(self, reference=None):
         expense = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'

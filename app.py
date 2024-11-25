@@ -4,7 +4,7 @@ from views.login import login
 from views.register import register
 from views.expenses import add_expense, view_expenses, view_expenses_by_category
 from views.incomes import add_income, view_incomes, view_incomes_by_category
-from views.categories import set_category_budget, view_category_budget
+from views.categories import set_category_budget, view_category_budget, select_user_category
 from views.goals import add_goal, view_goals_progress
 
 # Utilities
@@ -17,8 +17,7 @@ from templates import WELCOME_MENU, DASHBOARD_MENU, LOGOUT_MESSAGE, ERROR_MESSAG
 ### Application start ###
 def app_logic():
 
-    # user = None
-    user = User(id=1, email='test@test.com', password='password', created_at=None, last_login=None)
+    user = None
 
     while not user:
         menu_choice = input(WELCOME_MENU)
@@ -29,6 +28,7 @@ def app_logic():
             user = register()
         else:
             print(display_formatter(ERROR_MESSAGE, 'Please enter a valid option...'))
+            continue
 
     while user:
         menu_choice = input(DASHBOARD_MENU)
@@ -46,7 +46,8 @@ def app_logic():
         elif menu_choice == '6':  # View income by category
             view_incomes_by_category(user.id)
         elif menu_choice == '7':  # Set budget for a category
-            set_category_budget(user.id)
+            category=select_user_category(user.id, 'expense')
+            set_category_budget(category)
         elif menu_choice == '8':  # View budget for a category
             view_category_budget(user.id)
         elif menu_choice == '9':  # Set financial goals
@@ -54,7 +55,7 @@ def app_logic():
         elif menu_choice == '10':  # View progress to financial goals
             view_goals_progress(user.id)
         elif menu_choice == '11':  # Quit
-            print(display_formatter(LOGOUT_MESSAGE, user.email))
+            print(display_formatter(LOGOUT_MESSAGE, user.username))
             user = None
         else:
             print(display_formatter(ERROR_MESSAGE, 'Please enter a valid option...'))
