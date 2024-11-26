@@ -6,7 +6,7 @@ from db_access import get_user_categories, create_category, update_category, get
     get_user_categories_by_type, get_category_by_id, get_expenses_by_category, update_expense, delete_category, \
     get_income_by_category, update_income, update_income_category_to_null, update_expenses_category_to_null
 
-from general_utils import display_formatter, date_formatter, pause_terminal, amount_validator
+from general_utils import display_template, date_formatter, pause_terminal, amount_validator
 
 from templates import SELECT_CATEGORY, ADD_CATEGORY, CATEGORY_BUDGET
 
@@ -57,7 +57,10 @@ def add_category(user_id: int, cat_type: str) -> Category | None:
     desc = input('Enter a short description for the category: ').strip()
 
     # Validate a budget
-    budget = amount_validator(prompt='budget')
+    if cat_type == 'income':
+        budget = 0.00  # Budget not required for income category
+    elif cat_type == 'expense':
+        budget = amount_validator(prompt='monthly budget')
 
     # Create the new category
     new_category = Category.create(
@@ -105,7 +108,7 @@ def select_user_category(user_id: int, cat_type: str) -> Category | None:
     ADD_OPTION = len(categories) + 1
 
     try:
-        choice = int(input(display_formatter(SELECT_CATEGORY,ADD_OPTION, cat_type)))
+        choice = int(input(display_template(SELECT_CATEGORY, ADD_OPTION, cat_type)))
     except ValueError:
         return None
 
@@ -147,7 +150,7 @@ def set_category_budget(category: Category):
 
     while True:
         try:
-            new_budget = float(input(f'\nEnter the monthly budget amount for {category.name}: '))
+            new_budget = amount_validator('new budget')
 
             if new_budget < 0:
                 print('The budget cannot be negative.')
@@ -175,7 +178,7 @@ def view_category_budget(user_id: int):
     search_date = date_formatter(full_date=False)  # Returns a 'YYYY-MM' formatted string
 
     # Retrieve the expenditures for the month
-    expenses = get_expenses_by_month(search_date)
+    expenses = get_expenses_by_month(user_id, search_date)
     if not expenses:
         print(f'No expenses found for {search_date}')
         return
@@ -218,11 +221,13 @@ def view_category_budget(user_id: int):
     # Display budget information
     month = datetime.strptime(search_date, '%Y-%m').strftime('%B')
     year = datetime.strptime(search_date, '%Y-%m').strftime('%Y')
-    print(display_formatter(CATEGORY_BUDGET,
-                            category.name,
-                            month,
-                            year,
-                            spent,
-                            remaining,
-                            category.budget))
+
+
+    print(display_template(CATEGORY_BUDGET,
+                           category.name,
+                           month,
+                           year,
+                           spent,
+                           remaining,
+                           category.budget))
     pause_terminal()

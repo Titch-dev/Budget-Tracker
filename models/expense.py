@@ -38,9 +38,9 @@ class Expense:
     def display_short(self, reference=None):
         expense = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         if reference:
-            expense += f'                                                       reference # {reference} \n'
+            expense += f'                                                           ref # {reference} \n'
         expense += f'Expense name:        {self.name}\n'\
-                   f'Expense amount:      {self.amount}\n'\
+                   f'Expense amount:      R{self.amount}\n'\
                    f'Expense effect date: {self.effect_date}\n'
         if self.cat_name:
             expense += f'Expense category:    {self.cat_name}\n'
@@ -52,7 +52,7 @@ class Expense:
         expense = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'\
               f'Expense ID:          {self.id}\n'\
               f'Expense name:        {self.name}\n'\
-              f'Expense amount:      {self.amount}\n'\
+              f'Expense amount:      R{self.amount}\n'\
               f'Expense effect date: {self.effect_date}\n'\
               f'Expense category:    {self.cat_name}\n'\
               f'Expense goal:        {self.goal_name}\n'

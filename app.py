@@ -1,14 +1,12 @@
 # Views
-from models.user import User
-from views.login import login
-from views.register import register
+from views.users import login, register, dashboard_menu
 from views.expenses import add_expense, view_expenses, view_expenses_by_category
 from views.incomes import add_income, view_incomes, view_incomes_by_category
 from views.categories import set_category_budget, view_category_budget, select_user_category
 from views.goals import add_goal, view_goals_progress
 
 # Utilities
-from general_utils import display_formatter
+from general_utils import display_template
 
 # templates
 from templates import WELCOME_MENU, DASHBOARD_MENU, LOGOUT_MESSAGE, ERROR_MESSAGE
@@ -27,11 +25,13 @@ def app_logic():
         elif menu_choice == '2':  # Register
             user = register()
         else:
-            print(display_formatter(ERROR_MESSAGE, 'Please enter a valid option...'))
+            print(display_template(ERROR_MESSAGE, 'Please enter a valid option...'))
             continue
 
     while user:
-        menu_choice = input(DASHBOARD_MENU)
+
+        dashboard_menu(user.id, user.username)
+        menu_choice = input('        Enter a number corresponding to the above option: ')
 
         if menu_choice == '1':  # Add expense
             add_expense(user.id)
@@ -55,7 +55,7 @@ def app_logic():
         elif menu_choice == '10':  # View progress to financial goals
             view_goals_progress(user.id)
         elif menu_choice == '11':  # Quit
-            print(display_formatter(LOGOUT_MESSAGE, user.username))
+            print(display_template(LOGOUT_MESSAGE, user.username))
             user = None
         else:
-            print(display_formatter(ERROR_MESSAGE, 'Please enter a valid option...'))
+            print(display_template(ERROR_MESSAGE, 'Please enter a valid option...'))

@@ -1,9 +1,9 @@
-def display_formatter(template: str, *dynamic_vars: str | int | float):
-    """Function to dynamically enter variables to display strings
+def display_template(template: str, *dynamic_vars: str | int | float) -> str:
+    """Parse a template string to format with dynamic variables
 
     Parameters:
-        template: string to format with variables
-        *dynamic_vars: strings and integers to format template
+        template (str): Template to format
+        *dynamic_vars (int | float | str): multiple
 
     Returns:
         Concatenated string
@@ -21,7 +21,7 @@ def amount_validator(prompt: str) -> float:
         float: A valid positive float"""
     while True:
         try:
-            amount = float(input(f'Enter a {prompt} amount: '))
+            amount = float(input(f'Enter {prompt} amount: R'))
             if amount < 0:
                 print('Invalid amount. please enter a positive number.')
                 continue

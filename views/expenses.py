@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from templates import ADD_EXPENSE, SELECT_EXPENSE, EXPENSE_OPTION, CATEGORY_OPTION, EXPENSE_VIEW, \
-    EXPENSE_SUMMARY
+    EXPENSE_SUMMARY, ERROR_MESSAGE, EXPENSE_LIST, EXPENSE_CATEGORY
 
 from models.expense import Expense
 
@@ -11,7 +11,7 @@ from views.goals import select_user_goal
 from db_access import create_expense, get_user_expenses, get_expenses_by_category, update_expense, \
     delete_expense, get_user_categories_by_type, get_expenses_by_month
 
-from general_utils import display_formatter, date_formatter, amount_validator, pause_terminal
+from general_utils import display_template, date_formatter, amount_validator, pause_terminal
 
 
 def add_expense(user_id: int):
@@ -25,7 +25,7 @@ def add_expense(user_id: int):
     # Get expense details
     name = input('Enter an expense name: ').strip()
     amount = amount_validator(prompt='expense')
-    print('Enter the date the expense will leave your account: ')
+    print('Enter the date the expense will leave your account')
     effect_date = date_formatter(full_date=True)
 
     # Create expense object without category or goal
@@ -66,7 +66,7 @@ def track_expenses(expenses: list[Expense], month: str = None):
             categories[expense.cat_name] = expense.amount
 
     # Display summary
-    print(display_formatter(EXPENSE_SUMMARY, month or "All Time", total))
+    print(display_template(EXPENSE_SUMMARY, month or "All Time", total))
 
     # Print categorised expenses
     for name, amount in categories.items():
@@ -93,21 +93,24 @@ def view_expenses(user_id: int) -> None:
                 print("No expenses found")
                 return
             track_expenses(expenses)  # Display expense totals by category
+            break
 
         elif view_choice == '2':  # get expenses by month
             search_month = date_formatter(full_date=False)
             month_name = datetime.strptime(search_month, '%Y-%m').strftime("%B")
-            expenses = get_expenses_by_month(search_month)
+            expenses = get_expenses_by_month(user_id, search_month)
             if not expenses:
-                print(f'No expenses found for {month_name}')
+                print(display_template(ERROR_MESSAGE, f'No expenses found for {month_name}'))
                 continue
             track_expenses(expenses, month_name)  # Display expense totals by category
+            break
 
         else:  # Exit or invalid option
-            print('Exiting expense viewer.')
+            print('Exiting expense viewer...')
             return
 
     # Display and interact with individual expenses
+    print(EXPENSE_LIST)
     ref_dict = {ref: expense for ref, expense in enumerate(expenses, start=1)}
     for ref, expense in ref_dict.items():
         expense.display_short(ref)
@@ -121,7 +124,7 @@ def view_expenses(user_id: int) -> None:
                 continue
             break
         except ValueError:
-            print('Exiting expense viewer.')
+            print('Exiting expense viewer...')
             return
 
     # Display detailed expense view and update/delete options
@@ -139,7 +142,7 @@ def view_expenses(user_id: int) -> None:
         else:
             print('Expense deletion canceled')
     else:
-        print('Exiting expense viewer')
+        print('Exiting expense viewer...')
 
 
 def view_expenses_by_category(user_id):
@@ -149,6 +152,7 @@ def view_expenses_by_category(user_id):
         user_id (int): ID of the user whose expenses are being managed.
     """
     # Retrieve and display users expense categories
+    print(EXPENSE_CATEGORY)
     categories = get_user_categories_by_type(user_id, "expense")
     if not categories:
         print('No expense categories found.')
@@ -179,7 +183,7 @@ def view_expenses_by_category(user_id):
             expense.display_short()
 
     # Options for the selected category
-    category_choice = input(display_formatter(CATEGORY_OPTION, category.name)).strip()
+    category_choice = input(display_template(CATEGORY_OPTION, category.name)).strip()
 
     if category_choice == '1':  # Change Category budget
         set_category_budget(category)

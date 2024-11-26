@@ -8,10 +8,10 @@ from models.goal import Goal
 from models.expense import Expense
 
 # utils
-from general_utils import display_formatter, date_formatter, amount_validator, pause_terminal
+from general_utils import display_template, date_formatter, amount_validator, pause_terminal
 
 # display
-from templates import SELECT_GOAL, ADD_GOAL, GOAL_SUMMARY
+from templates import SELECT_GOAL, ADD_GOAL, GOAL_SUMMARY, GOAL_LIST
 
 
 def is_goal_name_taken(user_id: int, name: str) -> bool:
@@ -71,15 +71,15 @@ def track_goals(expenses: list[Expense], goal: Goal) -> None:
         )
 
     # Display goal summary
-    print(display_formatter(GOAL_SUMMARY,
-                            goal.name,
-                            goal.desc,
-                            balance,
-                            goal.target,
-                            balance_left,
-                            goal.end_date,
-                            days_left if days_left >= 0 else 'Deadline passed',
-                            status_message))
+    print(display_template(GOAL_SUMMARY,
+                           goal.name,
+                           goal.desc,
+                           balance,
+                           goal.target,
+                           balance_left,
+                           goal.end_date,
+                           days_left if days_left >= 0 else 'Deadline passed',
+                           status_message))
     pause_terminal()
 
 
@@ -146,7 +146,7 @@ def select_user_goal(user_id: int) -> Goal | None:
 
     if not goals:
         print("No goals available")
-        choice = input('Would you like to add a goal?: ')
+        choice = input('Would you like to add a goal? (y/n): ').strip().lower()
         if choice == 'y':
             return add_goal(user_id)
         else:
@@ -161,7 +161,7 @@ def select_user_goal(user_id: int) -> Goal | None:
     ADD_OPTION = len(goals) + 1
 
     try:
-        goal_choice = int(input(display_formatter(SELECT_GOAL, ADD_OPTION)).strip())
+        goal_choice = int(input(display_template(SELECT_GOAL, ADD_OPTION)).strip())
     except ValueError:
         return None
 
@@ -180,6 +180,7 @@ def view_goals_progress(user_id: int) -> None:
         user_id (int): The ID of the user to get user goals
     """
     # User selects goal
+    print(GOAL_LIST)
     goal = select_user_goal(user_id)
     if not goal:
         print('Exiting goals progress...')

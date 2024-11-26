@@ -32,7 +32,7 @@ class Income:
     def display_short(self, reference=None):
         income = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         if reference:
-            income += f'                                                       reference # {reference} \n'
+            income += f'                                                           ref # {reference} \n'
         income += f'Income name:        {self.name}\n'\
                   f'Income amount:      {self.amount}\n'\
                   f'Income effect date: {self.effect_date}\n'\

@@ -28,7 +28,7 @@ class Goal:
     def display_short(self, reference=None):
         goal = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
         if reference:
-            goal += f'                                                       reference # {reference} \n'
+            goal += f'                                                           ref # {reference} \n'
         goal += f'Goal name:          {self.name}\n'\
                 f'Goal description:   {self.desc}\n'\
                 f'Goal target:        {self.target}\n'\

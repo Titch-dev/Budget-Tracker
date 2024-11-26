@@ -8,7 +8,7 @@ from models.income import Income
 from models.expense import Expense
 
 from db_access import get_income_by_id, get_user_by_id, get_goal_by_id, \
-    get_category_by_id, get_expense_by_id, get_user_by_email, \
+    get_category_by_id, get_expense_by_id, get_user_by_username, \
     get_user_categories, get_user_expenses, get_user_goals, get_user_income, \
     delete_category, delete_expense, delete_goal, delete_income, delete_user, \
     update_category, update_expense, update_goal, update_income, update_user, \
@@ -50,37 +50,36 @@ class TestDBAccess(TestCase):
 
     ### User queries ###
     def test_get_user_by_email(self):
-        expected_email = 'test@test.com'
-        expected_password = 'password'
-        actual = get_user_by_email('test@test.com')
+        expected_username = 'McFly'
+        expected_password = 'delorean'
+        actual = get_user_by_username('McFly')
 
-        self.assertEqual(expected_email, actual.email)
+        self.assertEqual(expected_username, actual.username)
         self.assertEqual(expected_password, actual.password)
 
     def test_get_user_by_id(self):
-        expected_email = 'test@test.com'
-        expected_password = 'password'
+        expected_username = 'McFly'
+        expected_password = 'delorean'
         actual = get_user_by_id(1)
 
-        self.assertEqual(expected_email, actual.email)
+        self.assertEqual(expected_username, actual.username)
         self.assertEqual(expected_password, actual.password)
 
     def test_create_user(self):
-        user = User.create(email='user@test.com', password='password')
+        user = User.create(username='Biff', password='almanac')
         create_user(user)
-        actual = get_user_by_email('user@test.com')
+        actual = get_user_by_username('Biff')
 
         self.assertTrue(actual)
-        self.assertEqual(user.email, actual.email)
+        self.assertEqual(user.username, actual.username)
         self.assertEqual(user.password, actual.password)
 
     def test_update_user(self):
-        user = get_user_by_email('test@test.com')
-        print(f"user email = {user.email}, user id = {user.id}")
+        user = get_user_by_username('McFly')
         user.password = 'test'
         update_user(user)
         expected = user
-        actual = get_user_by_email('test@test.com')
+        actual = get_user_by_username('McFly')
 
         self.assertEqual(expected.password, actual.password)
 
@@ -88,7 +87,6 @@ class TestDBAccess(TestCase):
         user_id = 1
         delete_user(user_id)
         actual = get_user_by_id(user_id)
-        print(actual)
 
         self.assertFalse(actual)
 
@@ -143,14 +141,14 @@ class TestDBAccess(TestCase):
     def test_get_user_categories(self):
         expected_categories = [Category(id=1,
                                          name='Salary',
-                                         desc='Monthly salary payment',
+                                         desc='Monthly salary payment.',
                                          budget=0.0,
                                          cat_type='income',
                                          created_at=None,
                                          user_id=1),
                                 Category(id=2,
                                          name='Rent',
-                                         desc='Monthly rent payment.',
+                                         desc='Monthly rental payment.',
                                          budget=0.0,
                                          cat_type='expense',
                                          created_at=None,
@@ -186,14 +184,14 @@ class TestDBAccess(TestCase):
 
         actual_categories = get_user_categories(1)
 
-        self.assertEqual(len(actual_categories), len(expected_categories), "The list lengths do not match")
+        self.assertEqual(len(expected_categories), len(actual_categories), "The list lengths do not match")
 
-        for actual, expected in zip(actual_categories, expected_categories):
-            self.assertEqual(actual.name, expected.name)
-            self.assertEqual(actual.desc, expected.desc)
-            self.assertEqual(actual.budget, expected.budget)
-            self.assertEqual(actual.cat_type, expected.cat_type)
-            self.assertEqual(actual.user_id, expected.user_id)
+        for expected, actual in zip(expected_categories, actual_categories):
+            self.assertEqual(expected.name, actual.name)
+            self.assertEqual(expected.desc, actual.desc)
+            self.assertEqual(expected.budget, actual.budget)
+            self.assertEqual(expected.cat_type, actual.cat_type)
+            self.assertEqual(expected.user_id, actual.user_id)
 
     def test_update_category(self):
         expected = get_category_by_id(1)
@@ -217,22 +215,21 @@ class TestDBAccess(TestCase):
     def test_get_user_categories_by_type(self):
         expected = [Category(id=1,
                              name='Salary',
-                             desc='Monthly salary payment',
+                             desc='Monthly salary payment.',
                              budget=0.0,
                              cat_type='income',
                              created_at=None,
                              user_id=1)]
         actual = get_user_categories_by_type(1, 'income')
 
-        self.assertEqual(len(actual), len(expected), "The list lengths do not match")
+        self.assertEqual(len(expected), len(actual), "The list lengths do not match")
 
-        for actual, expected in zip(actual, expected):
-            self.assertEqual(actual.name, expected.name)
-            self.assertEqual(actual.desc, expected.desc)
-            self.assertEqual(actual.budget, expected.budget)
-            self.assertEqual(actual.cat_type, expected.cat_type)
-            self.assertEqual(actual.user_id, expected.user_id)
-
+        for actual, expected in zip(expected, actual):
+            self.assertEqual(expected.name, actual.name)
+            self.assertEqual(expected.desc, actual.desc)
+            self.assertEqual(expected.budget, actual.budget)
+            self.assertEqual(expected.cat_type, actual.cat_type)
+            self.assertEqual(expected.user_id, actual.user_id)
 
     ##### Goals queries #####
     def test_get_goal_by_id(self):
@@ -320,7 +317,7 @@ class TestDBAccess(TestCase):
                                  amount=10.00,
                                  effect_date="2025-09-09",
                                  user_id=1)
-        create_income(expected, 1)
+        create_income(expected)
         self.cursor.execute('SELECT * FROM income WHERE name = "test"')
         data = self.cursor.fetchone()
         actual = Income(id=data[0],
@@ -795,28 +792,48 @@ class TestDBAccess(TestCase):
         self.assertFalse(actual)
 
     def test_get_expense_by_month(self):
-        expected = [Expense(id=16,
+        expected = [Expense(id=6,
+                            name='Rent',
+                            amount=1200.0,
+                            effect_date='2024-08-01',
+                            created_at=None,
+                            user_id=1,
+                            cat_id=2,
+                            cat_name='Rent',
+                            goal_id=None,
+                            goal_name=None),
+                    Expense(id=7,
                             name='Electricity Bill',
                             amount=60.0,
-                            effect_date='2024-10-03',
+                            effect_date='2024-08-03',
                             created_at=None,
                             user_id=1,
                             cat_id=3,
                             cat_name='Utilities',
                             goal_id=None,
                             goal_name=None),
-                    Expense(id=17,
+                    Expense(id=8,
                             name='Gas Bill',
                             amount=30.0,
-                            effect_date='2024-10-06',
+                            effect_date='2024-08-06',
                             created_at=None,
                             user_id=1,
                             cat_id=3,
                             cat_name='Utilities',
                             goal_id=None,
-                            goal_name=None)
+                            goal_name=None),
+                    Expense(id=9,
+                            name='Vacation Saving',
+                            amount=20.0,
+                            effect_date='2024-08-25',
+                            created_at=None,
+                            user_id=1,
+                            cat_id=6,
+                            cat_name='Goals',
+                            goal_id=1,
+                            goal_name='Vacation Fund')
                     ]
-        actual = get_expenses_by_month('2024-10', 3)
+        actual = get_expenses_by_month(1, '2024-08')
 
         self.assertEqual(len(expected), len(actual), 'The lists lengths dont match')
 

@@ -640,14 +640,15 @@ def get_income_by_category(cat_id: int) -> list[Income] | None:
         return data
 
 
-def get_income_by_month(month: str) -> list[Income] | None:
-    """Function to get a list of Income objects by month
+def get_income_by_month(user_id: int, month: str) -> list[Income] | None:
+    """Get a list of Income objects by filtered by month and user
 
     Parameters:
-        month: Str - format 'YY-MM'
+        user_id (int): The ID of the user to filter by
+        month (str): Date string to filter by - format 'YY-MM'
 
     Returns:
-        A list of Expense objects sharing a given month and category
+        List[Income]: A list of Income objects for a given month
     """
     conn, cur = db_connect()
     command = '''SELECT
@@ -666,11 +667,13 @@ def get_income_by_month(month: str) -> list[Income] | None:
                      ON
                         i.category_id = c.id
                      WHERE
-                        i.effect_date = ?'''
-    cur.execute(command, (month, ))
+                        i.effect_date LIKE ?
+                     AND
+                        i.user_id = ?'''
+    cur.execute(command, (month + '%', user_id))
     data = cur.fetchall()
     conn.close()
-    incomes = []
+    incomes = list()
     try:
         for row in data:
             income = Income(id=row[0],
@@ -687,6 +690,30 @@ def get_income_by_month(month: str) -> list[Income] | None:
 
     except TypeError:
         return data
+
+
+def get_sum_of_user_incomes(user_id: int) -> int:
+    """Get the aggregated sum of all incomes filtered by user_id
+
+    Parameters:
+        user_id (int): The ID of the user to filter by
+
+    Returns:
+        int: The aggregated sum of all incomes
+    """
+    conn, cur = db_connect()
+    command = '''SELECT
+                    SUM(amount)
+                FROM 
+                    income
+                WHERE
+                    user_id = ?
+                AND
+                    effect_date < DATE('now')'''
+    cur.execute(command, (user_id, ))
+    result = cur.fetchone()
+    conn.close()
+    return result[0]
 
 
 ##### EXPENSE #####
@@ -992,14 +1019,15 @@ def get_expenses_by_goal(goal_id: int) -> list[Expense]:
         return data
 
 
-def get_expenses_by_month(month: str) -> list[Expense] | None:
-    """Function to get a list of Expense objects by month
+def get_expenses_by_month(user_id: int, month: str) -> list[Expense] | None:
+    """Get a list of Expense objects by user id and month
 
     Parameters:
-        month: Str - format 'YY-MM'
+        user_id (int): The ID of the user to filter by
+        month (str): Date string to filter by - format 'YY-MM'
 
     Returns:
-        A list of Expense objects sharing a given month and category
+        List[Expense]: A list of Expense objects for a given month
     """
     conn, cur = db_connect()
     command = '''SELECT
@@ -1024,8 +1052,10 @@ def get_expenses_by_month(month: str) -> list[Expense] | None:
                  ON
                     e.goal_id = g.id
                  WHERE
-                    e.effect_date LIKE ?'''
-    cur.execute(command, (month + '%', ))
+                    e.effect_date LIKE ?
+                 AND
+                    e.user_id = ?'''
+    cur.execute(command, (month + '%', user_id))
     data = cur.fetchall()
     conn.close()
     expenses = list()
@@ -1045,3 +1075,27 @@ def get_expenses_by_month(month: str) -> list[Expense] | None:
         return expenses
     except TypeError:
         return data
+
+
+def get_sum_of_user_expenses_to_date(user_id: int) -> int:
+    """Get the aggregated sum of all expenses filtered by user_id
+
+    Parameters:
+        user_id (int): The ID of the user to filter by
+
+    Returns:
+        int: The aggregated sum of all expenses
+    """
+    conn, cur = db_connect()
+    command = '''SELECT
+                    SUM(amount)
+                FROM 
+                    expense
+                WHERE
+                    user_id = ?
+                AND
+                    effect_date < DATE('now')'''
+    cur.execute(command, (user_id, ))
+    result = cur.fetchone()
+    conn.close()
+    return result[0]
