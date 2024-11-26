@@ -14,7 +14,8 @@ from db_access import get_income_by_id, get_user_by_id, get_goal_by_id, \
     update_category, update_expense, update_goal, update_income, update_user, \
     create_user, create_goal, create_category, create_expense, create_income, \
     get_expenses_by_category, get_income_by_category, get_expenses_by_month, get_user_categories_by_type, \
-    get_category_by_name, update_income_category_to_null, update_expenses_category_to_null
+    get_category_by_name, update_income_category_to_null, update_expenses_category_to_null, get_sum_of_user_incomes, \
+    get_income_by_month, get_expenses_by_goal, get_sum_of_user_expenses_to_date
 
 from db_build import CREATE_USER_TABLE, CREATE_CATEGORY_TABLE, CREATE_GOAL_TABLE, \
     CREATE_INCOME_TABLE, CREATE_EXPENSE_TABLE, INSERT_USER, INSERT_CATEGORIES, \
@@ -49,7 +50,7 @@ class TestDBAccess(TestCase):
         self.conn.close()
 
     ### User queries ###
-    def test_get_user_by_email(self):
+    def test_get_user_by_username(self):
         expected_username = 'McFly'
         expected_password = 'delorean'
         actual = get_user_by_username('McFly')
@@ -481,6 +482,32 @@ class TestDBAccess(TestCase):
 
         self.assertFalse(actual)
 
+    def test_get_income_by_month(self):
+        month = '2024-10'
+        expected = [Income(id=5,
+                           name='Work Salary',
+                           amount=2000.0,
+                           effect_date='2024-10-25',
+                           created_at=None,
+                           user_id=1,
+                           cat_id=1,
+                           cat_name='Salary')]
+        actual = get_income_by_month(1, month)
+
+        self.assertEqual(len(expected), len(actual))
+
+        for expected, actual in zip(expected, actual):
+            self.assertEqual(expected.id, actual.id)
+            self.assertEqual(expected.name, actual.name)
+            self.assertEqual(expected.id, actual.id)
+
+    def test_get_sum_of_user_incomes(self):
+        expected = 10000
+        actual = get_sum_of_user_incomes(1)
+
+        self.assertEqual(expected, actual)
+
+
     ##### Expense queries #####
     def test_get_expense_by_id(self):
         expense_id = 1
@@ -710,7 +737,7 @@ class TestDBAccess(TestCase):
                     cat_id=6,
                     cat_name='Goals',
                     goal_id=1,
-                    goal_name='Vacation Fund'),
+                    goal_name='Vacation Fund')
         ]
         actual_expenses = get_user_expenses(1)
 
@@ -845,3 +872,50 @@ class TestDBAccess(TestCase):
             self.assertEqual(expected.user_id, actual.user_id)
             self.assertEqual(expected.cat_name, actual.cat_name)
             self.assertEqual(expected.goal_name, actual.goal_name)
+
+    def test_get_expenses_by_goal(self):
+        expected = [Expense(id=9,
+                            name='Vacation Saving',
+                            amount=20.0,
+                            effect_date='2024-08-25',
+                            created_at=None,
+                            user_id=1,
+                            cat_id=6,
+                            cat_name='Goals',
+                            goal_id=1,
+                            goal_name='Vacation Fund'),
+                    Expense(id=13,
+                            name='Vacation Saving',
+                            amount=30.0,
+                            effect_date='2024-09-25',
+                            created_at=None,
+                            user_id=1,
+                            cat_id=6,
+                            cat_name='Goals',
+                            goal_id=1,
+                            goal_name='Vacation Fund'),
+                    Expense(id=19,
+                            name='Vacation Saving',
+                            amount=30.0,
+                            effect_date='2024-10-25',
+                            created_at=None,
+                            user_id=1,
+                            cat_id=6,
+                            cat_name='Goals',
+                            goal_id=1,
+                            goal_name='Vacation Fund')]
+
+        actual = get_expenses_by_goal(1)
+
+        self.assertEqual(len(expected), len(actual))
+
+        for expected, actual in zip(expected, actual):
+            self.assertEqual(expected.id, actual.id)
+            self.assertEqual(expected.goal_name, actual.goal_name)
+            self.assertEqual(expected.goal_id, actual.goal_id)
+
+    def test_get_sum_of_user_expenses_to_date(self):
+        expected = 5415.0
+        actual = get_sum_of_user_expenses_to_date(1)
+
+        self.assertEqual(expected, actual)
