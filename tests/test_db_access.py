@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from unittest import TestCase
 
@@ -145,15 +146,11 @@ class TestDBAccess(TestCase):
 
     def test_update_category(self):
         expected = get_category_by_id(1)
-        expected.name = 'test'
         expected.budget = 100
         update_category(expected)
         actual = get_category_by_id(1)
 
-        self.assertEqual(actual.name, expected.name)
-        self.assertEqual(actual.budget, expected.budget)
-
-        pass
+        self.assertEqual(expected.budget, actual.budget)
 
     def test_delete_category(self):
         category_id = 1
@@ -285,10 +282,7 @@ class TestDBAccess(TestCase):
 
     def test_update_income(self):
         expected = get_income_by_id(1)
-        expected.name = 'test'
         expected.amount = 1200.00
-        expected.cat_id = 6
-        expected.cat_name = 'Goals'
 
         update_income(expected)
         actual = get_income_by_id(1)
@@ -422,17 +416,11 @@ class TestDBAccess(TestCase):
 
     def test_update_expense(self):
         expected = get_expense_by_id(1)
-        expected.name = 'test'
         expected.amount = 100.00
-        expected.effect_date = '2021-09-09 20:00:00'
-        expected.cat_id = 1
-        expected.goal_id = 1
         update_expense(expected)
         actual = get_expense_by_id(1)
 
-        self.assertEqual(expected.name, actual.name)
         self.assertEqual(expected.amount, actual.amount)
-        self.assertEqual(expected.effect_date, actual.effect_date)
 
     def test_update_expenses_category_to_null(self):
         expected = Expense(id=15,
