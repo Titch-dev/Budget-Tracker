@@ -9,7 +9,7 @@ from views.goals import add_goal, view_goals_progress
 from general_utils import display_template
 
 # templates
-from templates import WELCOME_MENU, DASHBOARD_MENU, LOGOUT_MESSAGE, ERROR_MESSAGE
+from templates import WELCOME_MENU, LOGOUT_MESSAGE, ERROR_MESSAGE
 
 
 ### Application start ###

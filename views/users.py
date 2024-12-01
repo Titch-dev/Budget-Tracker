@@ -25,7 +25,7 @@ def login() -> User | None:
             return user
         else:
             print('Password does not match')
-    except TypeError:
+    except AttributeError:
         print('User does not exist')
 
 
@@ -82,12 +82,12 @@ def dashboard_menu(user_id: int, username: str) -> None:
     now = datetime.now().strftime('%d %b %Y')
 
     # Obtain the total income and expense to get balance
-    sum_income = get_sum_of_user_incomes(user_id)
-    sum_expense = get_sum_of_user_expenses_to_date(user_id)
+    sum_income = get_sum_of_user_incomes(user_id) or 0.00  # 0.00 if returns None
+    sum_expense = get_sum_of_user_expenses_to_date(user_id) or 0.00 # 0.00 if returns None
     balance = sum_income - sum_expense
 
     # display the dashboard template with user details
     print(display_template(DASHBOARD_MENU,
                            username,
-                           now,
-                           balance))
+                           balance,
+                           now))

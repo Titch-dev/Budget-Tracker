@@ -38,31 +38,6 @@ def get_user_by_username(username: str) -> User | None:
         return data
 
 
-def get_user_by_id(user_id: int) -> User:
-    """Function to update a user entry
-
-    Parameters:
-        user_id: Int
-
-    Returns:
-        User object
-    """
-    conn, cur = db_connect()
-    command = '''SELECT * FROM user WHERE id = ?'''
-    cur.execute(command, (user_id,))
-    data = cur.fetchone()
-    conn.close()
-    try:
-        user = User(id=data[0],
-                    username=data[1],
-                    password=data[2],
-                    created_at=data[3],
-                    last_login=data[4])
-        return user
-    except TypeError:
-        return data
-
-
 def create_user(user: User) -> None:
     """Function to create a user entry
 
@@ -77,41 +52,6 @@ def create_user(user: User) -> None:
     conn.commit()
     conn.close()
     print(f'User: {user.username}, has been created')
-
-
-def update_user(user: User) -> None:
-    """Function to update a user entry
-
-    Parameters:
-        user: User object
-    """
-    conn, cur = db_connect()
-    command = '''UPDATE user
-                SET username = ?,
-                    password = ?,
-                    last_login = ?
-                WHERE id = ?'''
-    cur.execute(command, (user.username,
-                          user.password,
-                          user.last_login,
-                          user.id))
-    conn.commit()
-    conn.close()
-    print(f'user: {user.username}, has been updated')
-
-
-def delete_user(user_id: int) -> None:
-    """Function to delete a user entry
-
-    Parameters:
-        user_id: Int
-    """
-    conn, cur = db_connect()
-    command = '''DELETE FROM user WHERE id = ?'''
-    cur.execute(command, (user_id,))
-    conn.commit()
-    conn.close()
-    print(f'user: {user_id}, has been deleted')
 
 
 ##### CATEGORY #####
@@ -129,31 +69,6 @@ def get_category_by_id(cat_id: int) -> Category:
     cur.execute(command, (cat_id, ))
     data = cur.fetchone()
     conn.close()
-    try:
-        return Category(id=data[0],
-                        name=data[1],
-                        desc=data[2],
-                        budget=data[3],
-                        cat_type=data[4],
-                        created_at=data[5],
-                        user_id=data[6])
-    except TypeError:
-        return data
-
-
-def get_category_by_name(name: str) -> Category | None:
-    """Function to get a category by name
-
-    Parameters:
-        name: Str
-
-    Returns:
-        A Category object
-    """
-    conn, cur = db_connect()
-    command = '''SELECT * FROM category WHERE name = ?'''
-    cur.execute(command, (name, ))
-    data = cur.fetchone()
     try:
         return Category(id=data[0],
                         name=data[1],
@@ -374,45 +289,6 @@ def get_user_goals(user_id: int) -> list[Goal] | None:
     except TypeError:
         return data
 
-
-def update_goal(goal: Goal) -> None:
-    """Function to update a Goal entry
-
-    Parameters:
-        goal: Goal
-    """
-    conn, cur = db_connect()
-    command = '''UPDATE 
-                    goal
-                SET
-                    name = ?,
-                    desc = ?,
-                    target = ?,
-                    end_date = ?
-                WHERE
-                    id = ?'''
-    cur.execute(command, (goal.name,
-                          goal.desc,
-                          goal.target,
-                          goal.end_date,
-                          goal.id))
-    conn.commit()
-    conn.close()
-    print(f'goal: {goal.name}, has been updated')
-
-
-def delete_goal(goal_id: int) -> None:
-    """Function to delete a Goal entry
-
-    Parameters:
-        goal_id: Int
-    """
-    conn, cur = db_connect()
-    command = '''DELETE FROM goal WHERE id = ?'''
-    cur.execute(command, (goal_id, ))
-    conn.commit()
-    conn.close()
-    print(f'goal: {goal_id}, has been deleted')
 
 
 ##### INCOME #####
@@ -790,7 +666,6 @@ def create_expense(expense: Expense) -> int:
     print(f'expense: {expense.name}, has been created')
     expense_id = cur.lastrowid
     conn.close()
-
     return expense_id
 
 
@@ -1058,6 +933,7 @@ def get_expenses_by_goal(goal_id: int) -> list[Expense]:
                     e.goal_id = ?'''
     cur.execute(command, (goal_id, ))
     data = cur.fetchall()
+    conn.close()
     expenses = []
     try:
         for row in data:

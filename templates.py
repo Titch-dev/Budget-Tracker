@@ -13,8 +13,8 @@ DASHBOARD_MENU = '''
                                              ___________________________
         1.  Add expense                     | {}
         2.  View expenses                   | 
-        3.  View expenses by category       | Date: {}
-        4.  Add income                      | Acc Balance:  R{}
+        3.  View expenses by category       | Acc Balance:  R{}
+        4.  Add income                      | Date:         {}
         5.  View income                     |___________________________
         6.  View income by category                 
         7.  Set budget for a category              

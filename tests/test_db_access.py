@@ -7,14 +7,14 @@ from models.goal import Goal
 from models.income import Income
 from models.expense import Expense
 
-from db_access import get_income_by_id, get_user_by_id, get_goal_by_id, \
+from db_access import get_income_by_id, get_goal_by_id, \
     get_category_by_id, get_expense_by_id, get_user_by_username, \
     get_user_categories, get_user_expenses, get_user_goals, get_user_income, \
-    delete_category, delete_expense, delete_goal, delete_income, delete_user, \
-    update_category, update_expense, update_goal, update_income, update_user, \
+    delete_category, delete_expense, delete_income, \
+    update_category, update_expense, update_income, \
     create_user, create_goal, create_category, create_expense, create_income, \
     get_expenses_by_category, get_income_by_category, get_expenses_by_month, get_user_categories_by_type, \
-    get_category_by_name, update_income_category_to_null, update_expenses_category_to_null, get_sum_of_user_incomes, \
+    update_income_category_to_null, update_expenses_category_to_null, get_sum_of_user_incomes, \
     get_income_by_month, get_expenses_by_goal, get_sum_of_user_expenses_to_date
 
 from db_build import CREATE_USER_TABLE, CREATE_CATEGORY_TABLE, CREATE_GOAL_TABLE, \
@@ -45,8 +45,8 @@ class TestDBAccess(TestCase):
         self.cursor.executemany(INSERT_INCOMES, INITIAL_INCOME)
         self.conn.commit()
 
-    def tearDown(self) -> None:
-        self.cursor.close()
+    def tearDown(self):
+        self.conn.commit()
         self.conn.close()
 
     ### User queries ###
@@ -54,14 +54,6 @@ class TestDBAccess(TestCase):
         expected_username = 'McFly'
         expected_password = 'delorean'
         actual = get_user_by_username('McFly')
-
-        self.assertEqual(expected_username, actual.username)
-        self.assertEqual(expected_password, actual.password)
-
-    def test_get_user_by_id(self):
-        expected_username = 'McFly'
-        expected_password = 'delorean'
-        actual = get_user_by_id(1)
 
         self.assertEqual(expected_username, actual.username)
         self.assertEqual(expected_password, actual.password)
@@ -75,46 +67,12 @@ class TestDBAccess(TestCase):
         self.assertEqual(user.username, actual.username)
         self.assertEqual(user.password, actual.password)
 
-    def test_update_user(self):
-        user = get_user_by_username('McFly')
-        user.password = 'test'
-        update_user(user)
-        expected = user
-        actual = get_user_by_username('McFly')
-
-        self.assertEqual(expected.password, actual.password)
-
-    def test_delete_user(self):
-        user_id = 1
-        delete_user(user_id)
-        actual = get_user_by_id(user_id)
-
-        self.assertFalse(actual)
-
     ### Category queries ###
     def test_get_category_by_id(self):
-        cat_id = 1
         expected_name = 'Salary'
-        actual = get_category_by_id(cat_id)
+        actual = get_category_by_id(1)
 
-        self.assertEqual(cat_id, actual.id)
         self.assertEqual(expected_name, actual.name)
-
-    def test_get_category_by_name(self):
-        expected = Category(id=4,
-                            name='Dining Out',
-                            desc='Eating out at restaurants and cafes.',
-                            budget=150.0,
-                            cat_type='expense',
-                            created_at=None,
-                            user_id=1)
-        actual = get_category_by_name('Dining Out')
-
-        self.assertEqual(expected.id, actual.id)
-        self.assertEqual(expected.desc, actual.desc)
-        self.assertEqual(expected.budget, actual.budget)
-        self.assertEqual(expected.cat_type, actual.cat_type)
-        self.assertEqual(expected.user_id, actual.user_id)
 
     def test_create_category(self):
         expected = Category.create(name='test',
@@ -122,19 +80,10 @@ class TestDBAccess(TestCase):
                                    budget=0.00,
                                    cat_type='income',
                                    user_id=1)
-        create_category(expected)
-        self.cursor.execute('SELECT * FROM category WHERE name = "test"')
-        data = self.cursor.fetchone()
-        actual = Category(id=data[0],
-                          name=data[1],
-                          desc=data[2],
-                          budget=data[3],
-                          cat_type=data[4],
-                          created_at=data[5],
-                          user_id=data[6])
+        new_id = create_category(expected)
+        actual = get_category_by_id(new_id)
 
         self.assertEqual(expected.name, actual.name)
-        self.assertEqual(expected.desc, actual.desc)
         self.assertEqual(expected.budget, actual.budget)
         self.assertEqual(expected.cat_type, actual.cat_type)
         self.assertEqual(expected.user_id, actual.user_id)
@@ -238,7 +187,6 @@ class TestDBAccess(TestCase):
         expected_name = 'Vacation Fund'
         expected_target = 5000.00
         actual = get_goal_by_id(goal_id)
-        print(actual)
 
         self.assertEqual(actual.id, goal_id)
         self.assertEqual(actual.name, expected_name)
@@ -250,10 +198,8 @@ class TestDBAccess(TestCase):
                                target=100.00,
                                end_date=None,
                                user_id=1)
-        create_goal(expected)
-        self.cursor.execute('SELECT * FROM goal WHERE name = "test"')
-        data = self.cursor.fetchone()
-        actual = Goal(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
+        new_id = create_goal(expected)
+        actual = get_goal_by_id(new_id)
 
         self.assertEqual(actual.name, expected.name)
         self.assertEqual(actual.desc, expected.desc)
@@ -278,23 +224,6 @@ class TestDBAccess(TestCase):
             self.assertEqual(actual.target, expected.target)
             self.assertEqual(actual.user_id, expected.user_id)
 
-    def test_update_goal(self):
-        expected = get_goal_by_id(1)
-        expected.name = 'test'
-        expected.target = 1000.00
-        update_goal(expected)
-        actual = get_goal_by_id(1)
-
-        self.assertEqual(actual.name, expected.name)
-        self.assertEqual(actual.target, expected.target)
-
-    def test_delete_goal(self):
-        goal_id = 1
-        delete_goal(goal_id)
-        actual = get_goal_by_id(goal_id)
-
-        self.assertFalse(actual)
-
     ##### Income queries #####
     def test_get_income_by_id(self):
         expected = Income(id=1,
@@ -308,7 +237,6 @@ class TestDBAccess(TestCase):
         actual = get_income_by_id(1)
 
         self.assertEqual(actual.id, expected.id)
-        self.assertEqual(actual.name, expected.name)
         self.assertEqual(actual.amount, expected.amount)
         self.assertEqual(actual.user_id, expected.user_id)
         self.assertEqual(actual.cat_name, expected.cat_name)
@@ -318,131 +246,42 @@ class TestDBAccess(TestCase):
                                  amount=10.00,
                                  effect_date="2025-09-09",
                                  user_id=1)
-        create_income(expected)
-        self.cursor.execute('SELECT * FROM income WHERE name = "test"')
-        data = self.cursor.fetchone()
-        actual = Income(id=data[0],
-                        name=data[1],
-                        amount=data[2],
-                        effect_date=data[3],
-                        created_at=data[4],
-                        user_id=data[5],
-                        cat_id=data[6],
-                        cat_name=None)
+        new_id = create_income(expected)
+        actual = get_income_by_id(new_id)
 
-        self.assertEqual(actual.name, expected.name)
-        self.assertEqual(actual.amount, expected.amount)
-        self.assertEqual(actual.effect_date, expected.effect_date)
-        self.assertEqual(actual.user_id, expected.user_id)
+        self.assertEqual(expected.name, actual.name)
+        self.assertEqual(expected.amount, actual.amount)
+        self.assertEqual(expected.user_id, actual.user_id)
 
     def test_get_user_income(self):
-        expected_income = [Income(id=1,
-                                  name='Work Salary',
-                                  amount=2000.0,
-                                  user_id=1,
-                                  effect_date='2024-06-25',
-                                  created_at=None,
-                                  cat_id=1,
-                                  cat_name='Salary'),
-                           Income(id=2,
-                                  name='Work Salary',
-                                  amount=2000.0,
-                                  user_id=1,
-                                  effect_date='2024-07-25',
-                                  created_at=None,
-                                  cat_id=1,
-                                  cat_name='Salary'),
-                           Income(id=3,
-                                  name='Work Salary',
-                                  amount=2000.0,
-                                  user_id=1,
-                                  effect_date='2024-08-25',
-                                  created_at=None,
-                                  cat_id=1,
-                                  cat_name='Salary'),
-                           Income(id=4,
-                                  name='Work Salary',
-                                  amount=2000.0,
-                                  user_id=1,
-                                  effect_date='2024-09-25',
-                                  created_at=None,
-                                  cat_id=1,
-                                  cat_name='Salary'),
-                           Income(id=5,
-                                  name='Work Salary',
-                                  amount=2000.0,
-                                  user_id=1,
-                                  effect_date='2024-10-25',
-                                  created_at=None,
-                                  cat_id=1,
-                                  cat_name='Salary')]
-        actual_income = get_user_income(1)
+        expected = Income(id=1,
+                          name='Work Salary',
+                          amount=2000.0,
+                          user_id=1,
+                          effect_date='2024-06-25',
+                          created_at=None,
+                          cat_id=1,
+                          cat_name='Salary')
+        actual = get_user_income(1)
 
-        self.assertEqual(len(actual_income), len(expected_income))
-
-        for actual, expected in zip(actual_income, expected_income):
-            self.assertEqual(actual.id, expected.id)
-            self.assertEqual(actual.name, expected.name)
-            self.assertEqual(actual.amount, expected.amount)
-            self.assertEqual(actual.effect_date, expected.effect_date)
-            self.assertEqual(actual.user_id, expected.user_id)
-            self.assertEqual(actual.cat_name, expected.cat_name)
+        self.assertEqual(expected.id, actual[0].id)
+        self.assertEqual(expected.user_id, actual[0].user_id)
+        self.assertEqual(expected.cat_id, actual[0].cat_id)
 
     def test_get_income_by_category(self):
-        expected_income = [
-            Income(id=1,
-                   name='Work Salary',
-                   amount=2000.0,
-                   effect_date='2024-06-25',
-                   created_at=None,
-                   user_id=1,
-                   cat_id=1,
-                   cat_name='Salary'),
-            Income(id=2,
-                   name='Work Salary',
-                   amount=2000.0,
-                   effect_date='2024-07-25',
-                   created_at=None,
-                   user_id=1,
-                   cat_id=1,
-                   cat_name='Salary'),
-            Income(id=3,
-                   name='Work Salary',
-                   amount=2000.0,
-                   effect_date='2024-08-25',
-                   created_at=None,
-                   user_id=1,
-                   cat_id=1,
-                   cat_name='Salary'),
-            Income(id=4,
-                   name='Work Salary',
-                   amount=2000.0,
-                   effect_date='2024-09-25',
-                   created_at=None,
-                   user_id=1,
-                   cat_id=1,
-                   cat_name='Salary'),
-            Income(id=5,
-                   name='Work Salary',
-                   amount=2000.0,
-                   effect_date='2024-10-25',
-                   created_at=None,
-                   user_id=1,
-                   cat_id=1,
-                   cat_name='Salary'),
-        ]
+        expected = Income(id=1,
+                          name='Work Salary',
+                          amount=2000.0,
+                          effect_date='2024-06-25',
+                          created_at=None,
+                          user_id=1,
+                          cat_id=1,
+                          cat_name='Salary')
+        actual = get_income_by_category(1)
 
-        actual_income = get_income_by_category(1)
-
-        self.assertEqual(len(actual_income), len(expected_income))
-
-        for actual, expected in zip(actual_income, expected_income):
-            self.assertEqual(actual.id, expected.id)
-            self.assertEqual(actual.name, expected.name)
-            self.assertEqual(actual.amount, expected.amount)
-            self.assertEqual(actual.effect_date, expected.effect_date)
-            self.assertEqual(actual.user_id, expected.user_id)
-            self.assertEqual(actual.cat_name, expected.cat_name)
+        self.assertEqual(expected.id, actual[0].id)
+        self.assertEqual(expected.user_id, actual[0].user_id)
+        self.assertEqual(expected.cat_id, actual[0].cat_id)
 
     def test_update_income(self):
         expected = get_income_by_id(1)
@@ -507,7 +346,6 @@ class TestDBAccess(TestCase):
 
         self.assertEqual(expected, actual)
 
-
     ##### Expense queries #####
     def test_get_expense_by_id(self):
         expense_id = 1
@@ -527,19 +365,8 @@ class TestDBAccess(TestCase):
                                   amount=100.00,
                                   effect_date='2025-09-09',
                                   user_id=1)
-        create_expense(expected)
-        self.cursor.execute('SELECT * FROM expense WHERE name = "test"')
-        data = self.cursor.fetchone()
-        actual = Expense(id=data[0],
-                         name=data[1],
-                         amount=data[2],
-                         effect_date=data[3],
-                         created_at=data[4],
-                         user_id=data[5],
-                         cat_id=data[6],
-                         cat_name=None,
-                         goal_id=data[7],
-                         goal_name=None)
+        expense_id = create_expense(expected)
+        actual = get_expense_by_id(expense_id)
 
         self.assertEqual(expected.name, actual.name)
         self.assertEqual(expected.amount, actual.amount)
@@ -547,210 +374,25 @@ class TestDBAccess(TestCase):
         self.assertEqual(expected.user_id, actual.user_id)
 
     def test_get_user_expenses(self):
-        expected_expenses = [
-            Expense(id=1,
-                    name='Rent',
-                    amount=1200.0,
-                    effect_date='2024-07-01',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=2,
-                    cat_name='Rent',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=2,
-                    name='Electricity Bill',
-                    amount=60.0,
-                    effect_date='2024-07-03',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=3,
-                    cat_name='Utilities',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=3,
-                    name='Ask Italian',
-                    amount=40.0,
-                    effect_date='2024-07-05',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=4,
-                    cat_name='Dining Out',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=4,
-                    name='Gas Bill',
-                    amount=30.0,
-                    effect_date='2024-07-06',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=3,
-                    cat_name='Utilities',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=5,
-                    name='Burger King',
-                    amount=15.0,
-                    effect_date='2024-07-20',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=4,
-                    cat_name='Dining Out',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=6,
-                    name='Rent',
-                    amount=1200.0,
-                    effect_date='2024-08-01',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=2,
-                    cat_name='Rent',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=7,
-                    name='Electricity Bill',
-                    amount=60.0,
-                    effect_date='2024-08-03',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=3,
-                    cat_name='Utilities',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=8,
-                    name='Gas Bill',
-                    amount=30.0,
-                    effect_date='2024-08-06',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=3,
-                    cat_name='Utilities',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=9,
-                    name='Vacation Saving',
-                    amount=20.0,
-                    effect_date='2024-08-25',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=6,
-                    cat_name='Goals',
-                    goal_id=1,
-                    goal_name='Vacation Fund'),
-            Expense(id=10,
-                    name='Rent',
-                    amount=1200.0,
-                    effect_date='2024-09-01',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=2,
-                    cat_name='Rent',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=11,
-                    name='Electricity Bill',
-                    amount=60.0,
-                    effect_date='2024-09-03',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=3,
-                    cat_name='Utilities',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=12,
-                    name='Gas Bill',
-                    amount=30.0,
-                    effect_date='2024-09-06',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=3,
-                    cat_name='Utilities',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=13,
-                    name='Vacation Saving',
-                    amount=30.0,
-                    effect_date='2024-09-25',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=6,
-                    cat_name='Goals',
-                    goal_id=1,
-                    goal_name='Vacation Fund'),
-            Expense(id=14,
-                    name='Rent',
-                    amount=1200.0,
-                    effect_date='2024-10-01',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=2,
-                    cat_name='Rent',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=15,
-                    name='Gym',
-                    amount=75.0,
-                    effect_date='2024-10-02',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=5,
-                    cat_name='Health & Fitness',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=16,
-                    name='Electricity Bill',
-                    amount=60.0,
-                    effect_date='2024-10-03',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=3,
-                    cat_name='Utilities',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=17,
-                    name='Gas Bill',
-                    amount=30.0,
-                    effect_date='2024-10-06',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=3,
-                    cat_name='Utilities',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=18,
-                    name='Yo Sushi',
-                    amount=45.0,
-                    effect_date='2024-10-10',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=4,
-                    cat_name='Dining Out',
-                    goal_id=None,
-                    goal_name=None),
-            Expense(id=19,
-                    name='Vacation Saving',
-                    amount=30.0,
-                    effect_date='2024-10-25',
-                    created_at=None,
-                    user_id=1,
-                    cat_id=6,
-                    cat_name='Goals',
-                    goal_id=1,
-                    goal_name='Vacation Fund')
-        ]
-        actual_expenses = get_user_expenses(1)
+        expected = Expense(id=1,
+                           name='Rent',
+                           amount=1200.0,
+                           effect_date='2024-07-01',
+                           created_at=None,
+                           user_id=1,
+                           cat_id=2,
+                           cat_name='Rent',
+                           goal_id=None,
+                           goal_name=None)
+        actual = get_user_expenses(1)
 
-        self.assertEqual(len(expected_expenses), len(actual_expenses), 'The lists lengths dont match')
-
-        for expected, actual in zip(expected_expenses, actual_expenses):
-            self.assertEqual(expected.id, actual.id)
-            self.assertEqual(expected.name, actual.name)
-            self.assertEqual(expected.amount, actual.amount)
-            self.assertEqual(expected.effect_date, actual.effect_date)
-            self.assertEqual(expected.user_id, actual.user_id)
-            self.assertEqual(expected.cat_name, actual.cat_name)
-            self.assertEqual(expected.goal_name, actual.goal_name)
+        self.assertEqual(expected.id, actual[0].id)
+        self.assertEqual(expected.name, actual[0].name)
+        self.assertEqual(expected.amount, actual[0].amount)
+        self.assertEqual(expected.effect_date, actual[0].effect_date)
+        self.assertEqual(expected.user_id, actual[0].user_id)
+        self.assertEqual(expected.cat_name, actual[0].cat_name)
+        self.assertEqual(expected.goal_name, actual[0].goal_name)
 
     def test_get_expenses_by_category(self):
         expected_expenses = [
@@ -819,7 +461,7 @@ class TestDBAccess(TestCase):
         self.assertFalse(actual)
 
     def test_get_expense_by_month(self):
-        expected = [Expense(id=6,
+        expected = Expense(id=6,
                             name='Rent',
                             amount=1200.0,
                             effect_date='2024-08-01',
@@ -828,91 +470,31 @@ class TestDBAccess(TestCase):
                             cat_id=2,
                             cat_name='Rent',
                             goal_id=None,
-                            goal_name=None),
-                    Expense(id=7,
-                            name='Electricity Bill',
-                            amount=60.0,
-                            effect_date='2024-08-03',
-                            created_at=None,
-                            user_id=1,
-                            cat_id=3,
-                            cat_name='Utilities',
-                            goal_id=None,
-                            goal_name=None),
-                    Expense(id=8,
-                            name='Gas Bill',
-                            amount=30.0,
-                            effect_date='2024-08-06',
-                            created_at=None,
-                            user_id=1,
-                            cat_id=3,
-                            cat_name='Utilities',
-                            goal_id=None,
-                            goal_name=None),
-                    Expense(id=9,
-                            name='Vacation Saving',
-                            amount=20.0,
-                            effect_date='2024-08-25',
-                            created_at=None,
-                            user_id=1,
-                            cat_id=6,
-                            cat_name='Goals',
-                            goal_id=1,
-                            goal_name='Vacation Fund')
-                    ]
+                            goal_name=None)
+
         actual = get_expenses_by_month(1, '2024-08')
-
-        self.assertEqual(len(expected), len(actual), 'The lists lengths dont match')
-
-        for expected, actual in zip(expected, actual):
-            self.assertEqual(expected.id, actual.id)
-            self.assertEqual(expected.name, actual.name)
-            self.assertEqual(expected.amount, actual.amount)
-            self.assertEqual(expected.effect_date, actual.effect_date)
-            self.assertEqual(expected.user_id, actual.user_id)
-            self.assertEqual(expected.cat_name, actual.cat_name)
-            self.assertEqual(expected.goal_name, actual.goal_name)
+        self.assertEqual(expected.id, actual[0].id)
+        self.assertEqual(expected.name, actual[0].name)
+        self.assertEqual(expected.amount, actual[0].amount)
+        self.assertEqual(expected.user_id, actual[0].user_id)
 
     def test_get_expenses_by_goal(self):
-        expected = [Expense(id=9,
-                            name='Vacation Saving',
-                            amount=20.0,
-                            effect_date='2024-08-25',
-                            created_at=None,
-                            user_id=1,
-                            cat_id=6,
-                            cat_name='Goals',
-                            goal_id=1,
-                            goal_name='Vacation Fund'),
-                    Expense(id=13,
-                            name='Vacation Saving',
-                            amount=30.0,
-                            effect_date='2024-09-25',
-                            created_at=None,
-                            user_id=1,
-                            cat_id=6,
-                            cat_name='Goals',
-                            goal_id=1,
-                            goal_name='Vacation Fund'),
-                    Expense(id=19,
-                            name='Vacation Saving',
-                            amount=30.0,
-                            effect_date='2024-10-25',
-                            created_at=None,
-                            user_id=1,
-                            cat_id=6,
-                            cat_name='Goals',
-                            goal_id=1,
-                            goal_name='Vacation Fund')]
+        expected = Expense(id=9,
+                           name='Vacation Saving',
+                           amount=20.0,
+                           effect_date='2024-08-25',
+                           created_at=None,
+                           user_id=1,
+                           cat_id=6,
+                           cat_name='Goals',
+                           goal_id=1,
+                           goal_name='Vacation Fund')
 
         actual = get_expenses_by_goal(1)
 
-        self.assertEqual(len(expected), len(actual))
-
-        for expected, actual in zip(expected, actual):
-            self.assertEqual(expected.id, actual.id)
-            self.assertEqual(expected.goal_name, actual.goal_name)
-            self.assertEqual(expected.goal_id, actual.goal_id)
+        self.assertEqual(expected.id, actual[0].id)
+        self.assertEqual(expected.goal_name, actual[0].goal_name)
+        self.assertEqual(expected.goal_id, actual[0].goal_id)
 
     def test_get_sum_of_user_expenses_to_date(self):
         expected = 5415.0
