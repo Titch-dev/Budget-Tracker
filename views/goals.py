@@ -1,16 +1,11 @@
 from datetime import datetime
 
-# database interface
-from db_access import get_user_goals, create_goal, get_goal_by_id, get_expenses_by_goal
+from models import Goal, Expense
 
-# models
-from models.goal import Goal
-from models.expense import Expense
+from services import get_goal_by_id, get_user_goals, create_goal, get_expenses_by_goal
 
-# utils
 from general_utils import display_template, date_formatter, amount_validator, pause_terminal
 
-# display
 from templates import SELECT_GOAL, ADD_GOAL, GOAL_SUMMARY, GOAL_LIST
 
 
@@ -189,9 +184,10 @@ def view_goals_progress(user_id: int) -> None:
     # Get all expenses associated with the goal
     expenses = get_expenses_by_goal(goal.id)
     if not expenses:
-        print(f'No expenses associated with goal {goal.name}')
         goal.display_long()
-        print('Consider adding new expenses and linking this goal to them')
+        print(f'No expenses associated with goal {goal.name}')
+        print('Consider adding new expenses and linking this goal to them \n')
+        pause_terminal()
         return
 
     track_goals(expenses, goal)

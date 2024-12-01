@@ -2,7 +2,8 @@ from datetime import datetime
 
 
 class Goal:
-    def __init__(self, id: int, name: str, desc: str, target: float, end_date: datetime, created_at: datetime, user_id: int) -> None:
+    def __init__(self, id: int, name: str, desc: str, target: float,
+                 end_date: datetime, created_at: datetime, user_id: int) -> None:
         self.id = id
         self.name = name
         self.desc = desc
@@ -23,7 +24,7 @@ class Goal:
     
     def __repr__(self):
         return (f'<Goal id={self.id}, name={self.name}, desc={self.desc}, target={self.target}, '
-                f'end_date={self.end_date}, created_at={self.created_at}, user_id={self.user_id}')
+                f'end_date={self.end_date}, created_at={self.created_at}, user_id={self.user_id}>')
 
     def display_short(self, reference=None):
         goal = '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'

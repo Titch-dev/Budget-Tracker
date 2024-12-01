@@ -1,15 +1,16 @@
 from datetime import datetime
 
+from models import Income
+
+from services import (create_income, get_user_income, get_income_by_category, delete_income,
+                      get_income_by_month, update_income, get_user_categories_by_type)
+
+from views.categories import select_user_category, set_category_budget, remove_delete_category
+
 from general_utils import display_template, date_formatter, amount_validator, pause_terminal
 
-from templates import INCOME_ADD, INCOME_OPTION, CATEGORY_OPTION, INCOME_VIEW, INCOME_SUMMARY, SELECT_INCOME, \
-    ERROR_MESSAGE
-from models.income import Income
-
-from views.categories import select_user_category, get_user_categories, set_category_budget, remove_delete_category
-
-from db_access import create_income, get_user_income, get_income_by_category, delete_income, get_income_by_month, \
-    get_user_categories_by_type, update_income
+from templates import (INCOME_ADD, INCOME_OPTION, CATEGORY_OPTION, INCOME_VIEW,
+                       INCOME_SUMMARY, SELECT_INCOME, ERROR_MESSAGE)
 
 
 def add_income(user_id: int):

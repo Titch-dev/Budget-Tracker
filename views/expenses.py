@@ -1,15 +1,16 @@
 from datetime import datetime
 
-from templates import ADD_EXPENSE, SELECT_EXPENSE, EXPENSE_OPTION, CATEGORY_OPTION, EXPENSE_VIEW, \
-    EXPENSE_SUMMARY, ERROR_MESSAGE, EXPENSE_LIST, EXPENSE_CATEGORY
+from models import Expense
 
-from models.expense import Expense
+from services import (create_expense, get_user_expenses, get_expenses_by_category, update_expense,
+                      delete_expense, get_expenses_by_month, get_user_categories_by_type)
 
 from views.categories import select_user_category, remove_delete_category, set_category_budget
 from views.goals import select_user_goal
 
-from db_access import create_expense, get_user_expenses, get_expenses_by_category, update_expense, \
-    delete_expense, get_user_categories_by_type, get_expenses_by_month
+from templates import (ADD_EXPENSE, SELECT_EXPENSE, EXPENSE_OPTION, CATEGORY_OPTION,
+                       EXPENSE_VIEW, EXPENSE_SUMMARY, ERROR_MESSAGE, EXPENSE_LIST,
+                       EXPENSE_CATEGORY)
 
 from general_utils import display_template, date_formatter, amount_validator, pause_terminal
 

@@ -1,10 +1,11 @@
-from models.category import Category
-
 from datetime import datetime
 
-from db_access import get_user_categories, create_category, update_category, get_expenses_by_month, \
-    get_user_categories_by_type, get_category_by_id, get_expenses_by_category, update_expense, delete_category, \
-    get_income_by_category, update_income, update_income_category_to_null, update_expenses_category_to_null
+from models import Category
+
+from services import (get_user_categories, create_category, update_category,
+                      get_user_categories_by_type, get_category_by_id, delete_category,
+                      update_income_category_to_null, get_expenses_by_month,
+                      update_expenses_category_to_null)
 
 from general_utils import display_template, date_formatter, pause_terminal, amount_validator
 

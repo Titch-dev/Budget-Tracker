@@ -1,11 +1,13 @@
 import getpass
+
 from datetime import datetime
 
-from general_utils import display_template
-from models.user import User
+from models import User
 
-from db_access import get_user_by_username, create_user, get_sum_of_user_incomes, \
-    get_sum_of_user_expenses_to_date
+from services import (get_user_by_username, create_user, get_sum_of_user_incomes,
+                      get_sum_of_user_expenses_to_date)
+
+from general_utils import display_template
 
 from templates import ADD_USER, DASHBOARD_MENU
 
@@ -83,7 +85,7 @@ def dashboard_menu(user_id: int, username: str) -> None:
 
     # Obtain the total income and expense to get balance
     sum_income = get_sum_of_user_incomes(user_id) or 0.00  # 0.00 if returns None
-    sum_expense = get_sum_of_user_expenses_to_date(user_id) or 0.00 # 0.00 if returns None
+    sum_expense = get_sum_of_user_expenses_to_date(user_id) or 0.00  # 0.00 if returns None
     balance = sum_income - sum_expense
 
     # display the dashboard template with user details

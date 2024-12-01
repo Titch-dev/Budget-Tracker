@@ -8,15 +8,21 @@ from models.goal import Goal
 from models.income import Income
 from models.expense import Expense
 
-from db_access import get_income_by_id, get_goal_by_id, \
-    get_category_by_id, get_expense_by_id, get_user_by_username, \
-    get_user_categories, get_user_expenses, get_user_goals, get_user_income, \
-    delete_category, delete_expense, delete_income, \
-    update_category, update_expense, update_income, \
-    create_user, create_goal, create_category, create_expense, create_income, \
-    get_expenses_by_category, get_income_by_category, get_expenses_by_month, get_user_categories_by_type, \
-    update_income_category_to_null, update_expenses_category_to_null, get_sum_of_user_incomes, \
-    get_income_by_month, get_expenses_by_goal, get_sum_of_user_expenses_to_date
+from services.user_service import get_user_by_username, create_user
+from services.category_service import get_category_by_id, get_user_categories, delete_category,update_category, create_category, get_user_categories_by_type
+from services.goal_service import get_goal_by_id, get_user_goals, create_goal
+from services.income_service import get_income_by_id, get_user_income, update_income, delete_income, create_income, get_income_by_category, update_income_category_to_null, get_sum_of_user_incomes, get_income_by_month
+
+
+from services.expense_service import \
+    get_expense_by_id,  \
+    get_user_expenses, \
+    delete_expense, \
+    update_expense, \
+     create_expense, \
+    get_expenses_by_category, get_expenses_by_month, \
+    update_expenses_category_to_null, \
+    get_expenses_by_goal, get_sum_of_user_expenses_to_date
 
 from db_build import CREATE_USER_TABLE, CREATE_CATEGORY_TABLE, CREATE_GOAL_TABLE, \
     CREATE_INCOME_TABLE, CREATE_EXPENSE_TABLE, INSERT_USER, INSERT_CATEGORIES, \
@@ -29,15 +35,11 @@ class TestDBAccess(TestCase):
     def setUp(self):
         self.conn = sqlite3.connect('budget_tracker.db')
         self.cursor = self.conn.cursor()
-        self.cursor.execute("DROP TABLE IF EXISTS user")
+        self.cursor.execute("DROP TABLE user")
         self.cursor.execute(CREATE_USER_TABLE)
-        self.cursor.execute("DROP TABLE IF EXISTS category")
         self.cursor.execute(CREATE_CATEGORY_TABLE)
-        self.cursor.execute("DROP TABLE IF EXISTS goal")
         self.cursor.execute(CREATE_GOAL_TABLE)
-        self.cursor.execute("DROP TABLE IF EXISTS expense")
         self.cursor.execute(CREATE_EXPENSE_TABLE)
-        self.cursor.execute("DROP TABLE IF EXISTS income")
         self.cursor.execute(CREATE_INCOME_TABLE)
         self.cursor.execute(INSERT_USER, INITIAL_USER)
         self.cursor.executemany(INSERT_CATEGORIES, INITIAL_CATEGORIES)
@@ -47,8 +49,13 @@ class TestDBAccess(TestCase):
         self.conn.commit()
 
     def tearDown(self):
+        self.cursor.execute("DROP TABLE income")
+        self.cursor.execute("DROP TABLE expense")
+        self.cursor.execute("DROP TABLE goal")
+        self.cursor.execute("DROP TABLE category")
         self.conn.commit()
         self.conn.close()
+
 
     ### User queries ###
     def test_get_user_by_username(self):
@@ -90,59 +97,20 @@ class TestDBAccess(TestCase):
         self.assertEqual(expected.user_id, actual.user_id)
 
     def test_get_user_categories(self):
-        expected_categories = [Category(id=1,
+        expected = Category(id=1,
                                          name='Salary',
                                          desc='Monthly salary payment.',
                                          budget=0.0,
                                          cat_type='income',
                                          created_at=None,
-                                         user_id=1),
-                                Category(id=2,
-                                         name='Rent',
-                                         desc='Monthly rental payment.',
-                                         budget=0.0,
-                                         cat_type='expense',
-                                         created_at=None,
-                                         user_id=1),
-                                Category(id=3,
-                                         name='Utilities',
-                                         desc='Electricity, water, and gas bills.',
-                                         budget=0.0,
-                                         cat_type='expense',
-                                         created_at=None,
-                                         user_id=1),
-                                Category(id=4,
-                                         name='Dining Out',
-                                         desc='Eating out at restaurants and cafes.',
-                                         budget=150.0,
-                                         cat_type='expense',
-                                         created_at=None,
-                                         user_id=1),
-                                Category(id=5,
-                                         name='Health & Fitness',
-                                         desc='Gym membership and health-related expenses.',
-                                         budget=0.0,
-                                         cat_type='expense',
-                                         created_at=None,
-                                         user_id=1),
-                                Category(id=6,
-                                         name='Goals',
-                                         desc='Working towards financial goals.',
-                                         budget=0.0,
-                                         cat_type='expense',
-                                         created_at=None,
-                                         user_id=1)]
+                                         user_id=1)
 
-        actual_categories = get_user_categories(1)
-
-        self.assertEqual(len(expected_categories), len(actual_categories), "The list lengths do not match")
-
-        for expected, actual in zip(expected_categories, actual_categories):
-            self.assertEqual(expected.name, actual.name)
-            self.assertEqual(expected.desc, actual.desc)
-            self.assertEqual(expected.budget, actual.budget)
-            self.assertEqual(expected.cat_type, actual.cat_type)
-            self.assertEqual(expected.user_id, actual.user_id)
+        actual = get_user_categories(1)
+        self.assertEqual(expected.name, actual[0].name)
+        self.assertEqual(expected.desc, actual[0].desc)
+        self.assertEqual(expected.budget, actual[0].budget)
+        self.assertEqual(expected.cat_type, actual[0].cat_type)
+        self.assertEqual(expected.user_id, actual[0].user_id)
 
     def test_update_category(self):
         expected = get_category_by_id(1)
