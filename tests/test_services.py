@@ -8,26 +8,19 @@ from models.goal import Goal
 from models.income import Income
 from models.expense import Expense
 
-from services.user_service import get_user_by_username, create_user
-from services.category_service import get_category_by_id, get_user_categories, delete_category,update_category, create_category, get_user_categories_by_type
-from services.goal_service import get_goal_by_id, get_user_goals, create_goal
-from services.income_service import get_income_by_id, get_user_income, update_income, delete_income, create_income, get_income_by_category, update_income_category_to_null, get_sum_of_user_incomes, get_income_by_month
+from services import (get_user_by_username, create_user, get_category_by_id, get_user_categories,
+                      delete_category,update_category, create_category, get_user_categories_by_type,
+                      get_goal_by_id, get_user_goals, create_goal, get_income_by_id, get_user_income,
+                      update_income, delete_income, create_income, get_income_by_category,
+                      update_income_category_to_null, get_sum_of_user_incomes, get_income_by_month,
+                      get_expense_by_id, get_user_expenses, delete_expense, update_expense, create_expense,
+                      get_expenses_by_category, get_expenses_by_month, update_expenses_category_to_null,
+                      get_expenses_by_goal, get_sum_of_user_expenses_to_date)
 
-
-from services.expense_service import \
-    get_expense_by_id,  \
-    get_user_expenses, \
-    delete_expense, \
-    update_expense, \
-     create_expense, \
-    get_expenses_by_category, get_expenses_by_month, \
-    update_expenses_category_to_null, \
-    get_expenses_by_goal, get_sum_of_user_expenses_to_date
-
-from db_build import CREATE_USER_TABLE, CREATE_CATEGORY_TABLE, CREATE_GOAL_TABLE, \
-    CREATE_INCOME_TABLE, CREATE_EXPENSE_TABLE, INSERT_USER, INSERT_CATEGORIES, \
-    INSERT_GOAL, INSERT_INCOMES, INSERT_EXPENSES, INITIAL_USER, INITIAL_CATEGORIES, \
-    INITIAL_GOAL, INITIAL_INCOME, INITIAL_EXPENSES
+from db_build import (CREATE_USER_TABLE, CREATE_CATEGORY_TABLE, CREATE_GOAL_TABLE,
+                      CREATE_INCOME_TABLE, CREATE_EXPENSE_TABLE, INSERT_USER, INSERT_CATEGORIES,
+                      INSERT_GOAL, INSERT_INCOMES, INSERT_EXPENSES, INITIAL_USER, INITIAL_CATEGORIES,
+                      INITIAL_GOAL, INITIAL_INCOME, INITIAL_EXPENSES)
 
 
 class TestDBAccess(TestCase):
@@ -35,7 +28,7 @@ class TestDBAccess(TestCase):
     def setUp(self):
         self.conn = sqlite3.connect('budget_tracker.db')
         self.cursor = self.conn.cursor()
-        self.cursor.execute("DROP TABLE user")
+        self.cursor.execute("DROP TABLE IF EXISTS user")
         self.cursor.execute(CREATE_USER_TABLE)
         self.cursor.execute(CREATE_CATEGORY_TABLE)
         self.cursor.execute(CREATE_GOAL_TABLE)
@@ -49,10 +42,10 @@ class TestDBAccess(TestCase):
         self.conn.commit()
 
     def tearDown(self):
-        self.cursor.execute("DROP TABLE income")
-        self.cursor.execute("DROP TABLE expense")
-        self.cursor.execute("DROP TABLE goal")
-        self.cursor.execute("DROP TABLE category")
+        self.cursor.execute("DROP TABLE IF EXISTS income")
+        self.cursor.execute("DROP TABLE IF EXISTS  expense")
+        self.cursor.execute("DROP TABLE IF EXISTS goal")
+        self.cursor.execute("DROP TABLE IF EXISTS category")
         self.conn.commit()
         self.conn.close()
 

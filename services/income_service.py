@@ -76,7 +76,7 @@ def get_user_income(user_id: int) -> list[Income] | None:
                     i.id, i.name, i.amount, i.effect_date, i.created_at,
                     i.user_id, i.category_id, c.name as category_name 
                  FROM income i
-                 INNER JOIN category c ON i.category_id = c.id
+                 LEFT JOIN category c ON i.category_id = c.id
                  WHERE i.user_id in (?)'''
     cur.execute(command, (user_id, ))
     data = cur.fetchall()

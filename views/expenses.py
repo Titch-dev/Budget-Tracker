@@ -61,6 +61,8 @@ def track_expenses(expenses: list[Expense], month: str = None):
 
     for expense in expenses:
         total += expense.amount
+        if not expense.cat_name:
+            expense.cat_name = 'Misc.'
         if expense.cat_name in categories.keys():
             categories[expense.cat_name] += expense.amount
         else:

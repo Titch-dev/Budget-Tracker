@@ -46,8 +46,9 @@ def app_logic():
         elif menu_choice == '6':  # View income by category
             view_incomes_by_category(user.id)
         elif menu_choice == '7':  # Set budget for a category
-            category=select_user_category(user.id, 'expense')
-            set_category_budget(category)
+            category = select_user_category(user.id, 'expense')
+            if category:
+                set_category_budget(category)
         elif menu_choice == '8':  # View budget for a category
             view_category_budget(user.id)
         elif menu_choice == '9':  # Set financial goals

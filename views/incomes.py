@@ -55,6 +55,8 @@ def track_incomes(incomes: list[Income], month: str = None):
 
     for income in incomes:
         total += income.amount
+        if not income.cat_name:
+            income.cat_name = 'Misc.'
         if income.cat_name in categories.keys():
             categories[income.cat_name] += income.amount
         else:

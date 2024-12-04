@@ -37,11 +37,6 @@ financial goals. User defined categories help to filter search results.
 - Track financial goals
 
 ## Installation
-### Set up the database:
-1. Open a terminal, navigate to project root and execute file *db_build.py*
-```bash
-python3 db_build.py
-``` 
 
 ### Start the application:
 1. In a terminal, navigate to project root and execute file *main.py*

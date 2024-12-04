@@ -1,8 +1,8 @@
 import sqlite3
 
-conn = sqlite3.connect('budget_tracker.db')  # Production database
-cur = conn.cursor()
+DATABASE_NAME = 'budget_tracker.db'
 
+# Define the tables, initial data and insert commands
 CREATE_USER_TABLE = '''
 CREATE TABLE IF NOT EXISTS user(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,7 +72,6 @@ INSERT INTO goal(name, desc, target, end_date, user_id)
 '''
 
 INITIAL_GOAL = ("Vacation Fund", "Saving for a vacation trip to Hawaii.", 5000.00, "2025-06-01", 1)
-
 
 CREATE_EXPENSE_TABLE = '''
 CREATE TABLE IF NOT EXISTS expense(
@@ -156,31 +155,39 @@ INITIAL_INCOME = [
     ("Work Salary", 2000.00, "2024-10-25", 1, 1),
 ]
 
-try:
-    cur.execute("DROP TABLE IF EXISTS user")
-    cur.execute(CREATE_USER_TABLE)
-    cur.execute("DROP TABLE IF EXISTS category")
-    cur.execute(CREATE_CATEGORY_TABLE)
-    cur.execute("DROP TABLE IF EXISTS goal")
-    cur.execute(CREATE_GOAL_TABLE)
-    cur.execute("DROP TABLE IF EXISTS expense")
-    cur.execute(CREATE_EXPENSE_TABLE)
-    cur.execute("DROP TABLE IF EXISTS income")
-    cur.execute(CREATE_INCOME_TABLE)
-    conn.commit()
-except Exception as e:
-    conn.rollback()
-    print(e)
 
-try:
-    cur.execute(INSERT_USER, INITIAL_USER)
-    cur.executemany(INSERT_CATEGORIES, INITIAL_CATEGORIES)
-    cur.execute(INSERT_GOAL, INITIAL_GOAL)
-    cur.executemany(INSERT_EXPENSES, INITIAL_EXPENSES)
-    cur.executemany(INSERT_INCOMES, INITIAL_INCOME)
-    conn.commit()
-except Exception as e:
-    conn.rollback()
-    print(e)
+def build_database():
+    """
+    Set up the database and insert initial data.
+    """
+    conn = sqlite3.connect(DATABASE_NAME)  # Production database
+    cur = conn.cursor()
 
-conn.close()
+    try:
+        cur.execute("DROP TABLE IF EXISTS user")
+        cur.execute(CREATE_USER_TABLE)
+        cur.execute("DROP TABLE IF EXISTS category")
+        cur.execute(CREATE_CATEGORY_TABLE)
+        cur.execute("DROP TABLE IF EXISTS goal")
+        cur.execute(CREATE_GOAL_TABLE)
+        cur.execute("DROP TABLE IF EXISTS expense")
+        cur.execute(CREATE_EXPENSE_TABLE)
+        cur.execute("DROP TABLE IF EXISTS income")
+        cur.execute(CREATE_INCOME_TABLE)
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(e)
+
+    try:
+        cur.execute(INSERT_USER, INITIAL_USER)
+        cur.executemany(INSERT_CATEGORIES, INITIAL_CATEGORIES)
+        cur.execute(INSERT_GOAL, INITIAL_GOAL)
+        cur.executemany(INSERT_EXPENSES, INITIAL_EXPENSES)
+        cur.executemany(INSERT_INCOMES, INITIAL_INCOME)
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(e)
+
+    conn.close()

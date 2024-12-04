@@ -36,7 +36,7 @@ class Finance:
         details += f'{self.__class__.__name__} name:        {self.name}\n'\
                    f'{self.__class__.__name__} amount:      {self.amount}\n'\
                    f'{self.__class__.__name__} effect date: {self.effect_date}\n'\
-                   f'{self.__class__.__name__} category:    {self.cat_name}\n'''
+                   f'{self.__class__.__name__} category:    {self.cat_name}'''
         print(details)
 
     def display_long(self):

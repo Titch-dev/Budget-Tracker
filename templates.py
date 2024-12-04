@@ -97,7 +97,7 @@ SELECT_GOAL = '''
                         the below options:
 
                         {}. Create a new goal
-             Any other key. Do not assign a goal
+             Any other key. Cancel
                           ____________
                             Option: '''
 

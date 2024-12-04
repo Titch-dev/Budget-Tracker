@@ -29,11 +29,11 @@ class Expense(Finance):
         return f'{base_repr[:-2]} goal_id={self.goal_id}, goal_name={self.goal_name}'
 
     def display_short(self, reference=None):
-        super().display_short()
+        super().display_short(reference)
         if self.goal_name:
-            print(f'{self.__class__.__name__}:        {self.goal_name}\n')
+            print(f'{self.__class__.__name__} goal:        {self.goal_name}')
 
     def display_long(self):
         super().display_long()
         if self.goal_name:
-            print(f'{self.__class__.__name__}:        {self.goal_name}\n')
+            print(f'{self.__class__.__name__} goal:        {self.goal_name}')

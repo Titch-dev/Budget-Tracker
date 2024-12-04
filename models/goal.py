@@ -32,8 +32,7 @@ class Goal:
             goal += f'                                                           ref # {reference} \n'
         goal += f'Goal name:          {self.name}\n'\
                 f'Goal description:   {self.desc}\n'\
-                f'Goal target:        {self.target}\n'\
-                '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+                f'Goal target:        {self.target}'
         print(goal)
 
     def display_long(self):
@@ -43,6 +42,5 @@ class Goal:
                 f'Goal description:   {self.desc}\n' \
                 f'Goal target:        {self.target}\n' \
                 f'Goal end date:      {self.end_date}\n' \
-                f'Goal created:       {self.created_at}\n' \
-                '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+                f'Goal created:       {self.created_at}'
         print(goal)
